@@ -1,0 +1,343 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Fonts ─────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #FDFBF5;
+  color: #1C1A15;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+::selection {
+  background: #C9A227;
+  color: #FDFBF5;
+}
+
+:focus-visible {
+  outline: 2px solid #C9A227;
+  outline-offset: 2px;
+}
+
+/* ── Thin gold scrollbar ────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #1C1A15; }
+::-webkit-scrollbar-thumb { background: #C9A227; border-radius: 2px; }
+
+/* ── Scroll reveal — fade + slide up ───────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.70s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.70s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Slide-in from right to left ────────────────────────── */
+.slide-in {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.slide-in.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .slide-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Section backgrounds ─────────────────────────────────── */
+.section-cream {
+  background: #FDFBF5;
+}
+.section-dark {
+  background: #181512;
+}
+.section-dark-alt {
+  background: #1E1B16;
+}
+
+/* ── Eyebrow label ───────────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.eyebrow-dark {
+  color: #C9A227;
+}
+.eyebrow-light {
+  color: #8C7A1E;
+}
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1.5px;
+  background: currentColor;
+  opacity: 0.7;
+  border-radius: 2px;
+}
+
+/* ── Section heading ─────────────────────────────────────── */
+.section-h2-dark {
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+.section-h2-light {
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #1C1A15;
+}
+
+/* ── Body text ───────────────────────────────────────────── */
+.body-dark {
+  font-size: 15px;
+  color: rgba(255,255,255,0.58);
+  line-height: 1.72;
+}
+.body-light {
+  font-size: 15px;
+  color: rgba(28,26,21,0.62);
+  line-height: 1.72;
+}
+
+/* ── Gold accent ─────────────────────────────────────────── */
+.gold { color: #C9A227; }
+
+/* ── Clean card — light ──────────────────────────────────── */
+.card-light {
+  background: #ffffff;
+  border: 1px solid rgba(28,26,21,0.09);
+  border-radius: 16px;
+  transition: transform 0.30s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.30s cubic-bezier(0.22,1,0.36,1),
+              border-color 0.30s;
+}
+.card-light:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 48px rgba(28,26,21,0.10);
+  border-color: rgba(201,162,39,0.35);
+}
+
+/* ── Clean card — dark ───────────────────────────────────── */
+.card-dark {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  transition: transform 0.30s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.30s cubic-bezier(0.22,1,0.36,1),
+              border-color 0.30s;
+}
+.card-dark:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.30);
+  border-color: rgba(201,162,39,0.30);
+}
+
+/* ── Gold divider ────────────────────────────────────────── */
+.divider-gold {
+  width: 36px;
+  height: 2px;
+  background: #C9A227;
+  border-radius: 2px;
+  opacity: 0.70;
+}
+
+/* ── Gold pill (tag) ─────────────────────────────────────── */
+.tag-light {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(201,162,39,0.08);
+  color: rgba(28,26,21,0.75);
+  border: 1px solid rgba(201,162,39,0.22);
+  transition: background 0.2s, color 0.2s;
+  cursor: default;
+}
+.tag-light:hover {
+  background: rgba(201,162,39,0.15);
+  color: #1C1A15;
+}
+
+.tag-dark {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(201,162,39,0.10);
+  color: rgba(255,255,255,0.70);
+  border: 1px solid rgba(201,162,39,0.20);
+  transition: background 0.2s, color 0.2s;
+  cursor: default;
+}
+.tag-dark:hover {
+  background: rgba(201,162,39,0.18);
+  color: #fff;
+}
+
+/* ── Button primary (gold) ───────────────────────────────── */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #C9A227;
+  color: #1C1A15;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(201,162,39,0.28);
+}
+.btn-gold:hover {
+  background: #B8880C;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201,162,39,0.36);
+}
+.btn-gold:active {
+  transform: translateY(0);
+}
+
+/* ── Button ghost (dark bg) ──────────────────────────────── */
+.btn-ghost-dark {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: rgba(255,255,255,0.80);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.btn-ghost-dark:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.32);
+  transform: translateY(-1px);
+}
+
+/* ── Row list item ───────────────────────────────────────── */
+.list-row-light {
+  border-bottom: 1px solid rgba(28,26,21,0.08);
+  transition: background 0.22s, padding-left 0.22s;
+  border-left: 2px solid transparent;
+  border-radius: 8px;
+  padding-left: 0;
+  cursor: pointer;
+}
+.list-row-light:hover {
+  background: rgba(201,162,39,0.06);
+  border-left-color: #C9A227;
+  padding-left: 6px;
+}
+.list-row-light.active-row {
+  background: rgba(201,162,39,0.08);
+  border-left-color: #C9A227;
+  padding-left: 8px;
+}
+
+/* ── Dot bullet (gold) ───────────────────────────────────── */
+.dot-gold {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #C9A227;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+/* ── Wheel widget ────────────────────────────────────────── */
+.wheel-root { user-select: none; }
+
+/* ── FAQ accordion ───────────────────────────────────────── */
+.faq-item {
+  border-bottom: 1px solid rgba(28,26,21,0.09);
+  transition: background 0.22s;
+  border-radius: 0;
+}
+
+/* ── Form field ──────────────────────────────────────────── */
+.field-dark {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.10);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.field-dark::placeholder { color: rgba(255,255,255,0.35); }
+.field-dark:focus {
+  border-color: #C9A227;
+  box-shadow: 0 0 0 3px rgba(201,162,39,0.12);
+}
+
+/* ── Progress bar ────────────────────────────────────────── */
+.progress-track {
+  height: 3px;
+  border-radius: 2px;
+  flex: 1;
+  transition: background 0.3s;
+}
+
+/* ── Keyframes ───────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes orbitPulse {
+  0%, 100% { box-shadow: 0 0 0 0px rgba(201,162,39,0.3); }
+  50%       { box-shadow: 0 0 0 10px rgba(201,162,39,0); }
+}
+@keyframes glowRing {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.9; }
+}
