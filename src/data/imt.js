@@ -29,7 +29,7 @@ export const imtPrograms = [
     id: 'add',
     number: '03',
     short: 'ADD',
-    title: 'Accelerator Demo Day',
+    title: 'GAL Investment Readiness',
     description:
       'Connect high-growth cohorts with angel investors, VCs, and industry partners for high-stakes pitching.',
     accent: '#C1502E',
