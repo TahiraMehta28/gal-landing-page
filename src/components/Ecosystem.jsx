@@ -142,7 +142,7 @@ export default function Ecosystem() {
         >
           <span className="eyebrow eyebrow-dark" style={{ marginBottom: '14px', display: 'flex' }}>The Triple Helix</span>
           <h2 className="section-h2-dark font-display" style={{ marginBottom: '14px' }}>
-            You bring the work.
+            You bring your innovation.
             <br />
             <span className="gold">The ecosystem brings the rest.</span>
           </h2>

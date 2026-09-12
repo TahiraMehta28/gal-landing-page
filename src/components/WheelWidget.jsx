@@ -153,7 +153,7 @@ export default function WheelWidget({ items = [], rotationIndex = 0, activeIndex
                 }}
               >
                 <span style={{
-                  fontSize: '13px', fontWeight: 800,
+                  fontSize: '14.5px', fontWeight: 800,
                   color: isActive ? '#ffffff' : '#0f172a',
                   transition: 'color 0.25s',
                 }}>
@@ -173,16 +173,16 @@ export default function WheelWidget({ items = [], rotationIndex = 0, activeIndex
                   transition: 'transform 0.7s ease-out, color 0.25s ease',
                   background: 'none', border: 'none', padding: '4px 6px',
                   cursor: 'pointer', fontFamily: 'inherit',
-                  maxWidth: '110px', textAlign: 'center',
+                  maxWidth: '120px', textAlign: 'center',
                 }}
               >
                 <span style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
+                  fontSize: '12.5px',
+                  fontWeight: 800,
+                  letterSpacing: '0.07em',
                   textTransform: 'uppercase',
-                  color: isActive ? '#0f172a' : '#475569',
-                  lineHeight: 1.3,
+                  color: isActive ? '#0f172a' : '#334155',
+                  lineHeight: 1.25,
                 }}>
                   {item.nodeTitle}
                 </span>

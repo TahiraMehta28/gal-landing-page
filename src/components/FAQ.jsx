@@ -6,7 +6,7 @@ import useScrollReveal from '../hooks/useScrollReveal'
 function FAQItemLight({ faq, isOpen, onToggle }) {
   return (
     <div style={{
-      borderBottom: '1px solid rgba(28,26,21,0.09)',
+      borderBottom: '1px solid rgba(28,26,21,0.12)',
       transition: 'background 0.22s',
       borderRadius: '0',
     }}>
@@ -15,25 +15,25 @@ function FAQItemLight({ faq, isOpen, onToggle }) {
         style={{
           width: '100%', textAlign: 'left', display: 'flex',
           alignItems: 'flex-start', justifyContent: 'space-between',
-          gap: '16px', padding: '18px 4px',
+          gap: '16px', padding: '20px 4px',
           background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
         }}
         aria-expanded={isOpen}
       >
         <span style={{
-          fontSize: '15px', fontWeight: 600,
-          color: isOpen ? '#C9A227' : '#1C1A15',
-          lineHeight: 1.45, flex: 1,
+          fontSize: '17px', fontWeight: 700,
+          color: isOpen ? '#C9A227' : '#0f172a',
+          lineHeight: 1.4, flex: 1,
           transition: 'color 0.2s',
         }}>
           {faq.question}
         </span>
         <span style={{
-          width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
+          width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
           backgroundColor: isOpen ? '#C9A227' : 'rgba(28,26,21,0.08)',
-          color: isOpen ? '#1C1A15' : 'rgba(28,26,21,0.55)',
+          color: isOpen ? '#1C1A15' : 'rgba(28,26,21,0.70)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '16px', marginTop: '1px',
+          fontSize: '18px', fontWeight: 700, marginTop: '1px',
           transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
           transition: 'all 0.30s cubic-bezier(0.22,1,0.36,1)',
         }}>
@@ -47,9 +47,15 @@ function FAQItemLight({ faq, isOpen, onToggle }) {
         overflow: 'hidden',
         transition: 'max-height 0.42s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
       }}>
-        <div style={{ padding: '0 4px 20px' }}>
-          <div className="divider-gold" style={{ marginBottom: '12px' }} />
-          <p style={{ fontSize: '14px', color: 'rgba(28,26,21,0.62)', lineHeight: 1.78, margin: 0 }}>
+        <div style={{ padding: '0 4px 22px' }}>
+          <div className="divider-gold" style={{ marginBottom: '14px', height: '2px', backgroundColor: '#C9A227' }} />
+          <p style={{
+            fontSize: '15.5px',
+            fontWeight: 700,
+            color: '#1e293b',
+            lineHeight: 1.7,
+            margin: 0,
+          }}>
             {faq.answer}
           </p>
         </div>

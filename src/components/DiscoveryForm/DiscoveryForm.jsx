@@ -97,16 +97,16 @@ const DiscoveryForm = forwardRef(function DiscoveryForm(_, ref) {
                 const isDone = current > s.id
                 const isLast = idx === formSteps.length - 1
                 return (
-                  <div key={s.id} style={{ display: 'flex', alignItems: 'stretch', gap: '12px' }}>
+                  <div key={s.id} style={{ display: 'flex', alignItems: 'stretch', gap: '14px' }}>
                     {/* gutter: circle + connector */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '22px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '28px', flexShrink: 0 }}>
                       <span style={{
-                        width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-                        background: isDone ? '#f59e0b' : isActive ? 'rgba(245,158,11,0.20)' : '#262626',
-                        border: isActive || isDone ? '1.5px solid #f59e0b' : '1.5px solid #404040',
+                        width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
+                        background: isDone ? '#f59e0b' : isActive ? 'rgba(245,158,11,0.25)' : '#262626',
+                        border: isActive || isDone ? '2px solid #f59e0b' : '2px solid #404040',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '10px', fontWeight: 700,
-                        color: isDone ? '#1C1A15' : isActive ? '#f59e0b' : '#d4d4d4',
+                        fontSize: '12px', fontWeight: 800,
+                        color: isDone ? '#1C1A15' : isActive ? '#f59e0b' : '#e5e5e5',
                         transition: 'all 0.3s ease',
                       }}>
                         {isDone ? '✓' : s.id}
@@ -114,11 +114,11 @@ const DiscoveryForm = forwardRef(function DiscoveryForm(_, ref) {
                       {!isLast && (
                         <div style={{
                           flex: 1,
-                          width: '2px',
-                          minHeight: '10px',
-                          margin: '3px 0',
+                          width: '2.5px',
+                          minHeight: '14px',
+                          margin: '4px 0',
                           borderRadius: '999px',
-                          background: isDone ? '#f59e0b' : 'rgba(255,255,255,0.12)',
+                          background: isDone ? '#f59e0b' : 'rgba(255,255,255,0.15)',
                           transition: 'background-color 0.3s ease',
                         }} />
                       )}
@@ -128,25 +128,25 @@ const DiscoveryForm = forwardRef(function DiscoveryForm(_, ref) {
                     <div style={{
                       flex: 1,
                       display: 'flex', alignItems: 'center',
-                      marginBottom: '4px',
-                      padding: isActive ? '10px 12px' : '9px 0',
+                      marginBottom: '6px',
+                      padding: isActive ? '10px 14px' : '8px 0',
                       borderRadius: '12px',
-                      background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                      border: isActive ? '1px solid rgba(255,255,255,0.20)' : '1px solid transparent',
+                      background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+                      border: isActive ? '1px solid rgba(255,255,255,0.24)' : '1px solid transparent',
                       backdropFilter: isActive ? 'blur(8px)' : 'none',
                       WebkitBackdropFilter: isActive ? 'blur(8px)' : 'none',
                       transition: 'all 0.3s ease',
                     }}>
                       <span
                         style={{
-                          fontSize: '12px',
-                          fontWeight: isActive ? 600 : 500,
-                          color: isActive ? '#ffffff' : isDone ? 'rgba(255,255,255,0.45)' : '#d4d4d4',
+                          fontSize: isActive ? '15px' : '14px',
+                          fontWeight: isActive ? 700 : 600,
+                          color: isActive ? '#ffffff' : isDone ? 'rgba(255,255,255,0.75)' : '#d4d4d4',
                           transition: 'color 0.2s',
                           cursor: 'default',
                         }}
                         onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#ffffff' }}
-                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = isDone ? 'rgba(255,255,255,0.45)' : '#d4d4d4' }}
+                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = isDone ? 'rgba(255,255,255,0.75)' : '#d4d4d4' }}
                       >
                         {s.label}
                       </span>

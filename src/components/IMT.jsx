@@ -1,227 +1,242 @@
-import { useState } from 'react'
-import useScrollReveal from '../hooks/useScrollReveal'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { imtPrograms } from '../data/imt'
 
-const FOCUS_AREAS = [
-  {
-    num: '01',
-    title: 'Strategy & Governance',
-    description: 'Set direction and structure that outlast any one grant cycle.',
-    detail: 'Define your incubator\'s theory of change, stakeholder accountability framework and board-level reporting so your program survives leadership transitions and funding changes.',
-  },
-  {
-    num: '02',
-    title: 'Startup Support Systems',
-    description: 'Screening, mentoring and programming that actually moves founders forward.',
-    detail: 'Build intake frameworks that identify high-potential teams early, design milestone-based support tracks, and create mentoring structures where advice translates into action.',
-  },
-  {
-    num: '03',
-    title: 'Ecosystem Partnerships',
-    description: 'Corporate, mentor and investor networks your startups can actually use.',
-    detail: 'Develop structured corporate challenge programs, build curated mentor pools with real accountability, and create warm-introduction pipelines to capital — not just lists of contacts.',
-  },
-  {
-    num: '04',
-    title: 'Financial Sustainability',
-    description: 'Funding and operating models that don\'t collapse when the grant ends.',
-    detail: 'Map your revenue diversification strategy across fee-for-service, equity, corporate sponsorship and public funding — then build the systems to execute across all of them.',
-  },
-  {
-    num: '05',
-    title: 'Impact Measurement',
-    description: 'Proof that your ecosystem is producing outcomes, not just activity.',
-    detail: 'Design metrics frameworks that capture real economic and social value, build stakeholder dashboards that demonstrate ROI, and create narratives that secure continued investment.',
-  },
-]
+const EASE_SMOOTH = [0.22, 1, 0.36, 1]
 
-function FocusRow({ area, delay, isActive, onToggle }) {
-  const [ref, visible] = useScrollReveal()
-
+function RibbonRow({ program, index, onOpen }) {
   return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`reveal ${visible ? 'is-visible' : ''}`}
+    <motion.div
+      layoutId={`ribbon-${program.id}`}
+      onClick={() => onOpen(program.id)}
+      role="button"
+      tabIndex={0}
+      aria-label={`View details for ${program.title}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onOpen(program.id)
+        }
+      }}
+      initial={{ opacity: 0, x: -100, scale: 0.96 }}
+      whileInView={{ opacity: 1, x: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.15 }}
+      whileHover={{ y: -4, scale: 1.01, x: 5 }}
+      whileTap={{ scale: 0.99 }}
+      transition={{
+        duration: 0.6,
+        delay: index * 0.16,
+        ease: EASE_SMOOTH,
+        layout: { duration: 0.45, ease: EASE_SMOOTH },
+      }}
+      className="group relative cursor-pointer select-none w-full"
+      style={{
+        filter: 'drop-shadow(0 6px 18px rgba(15,23,42,0.07))',
+      }}
     >
+      {/* Outer chevron border wrapper */}
       <div
-        onClick={onToggle}
-        className={`list-row-light ${isActive ? 'active-row' : ''}`}
+        className="w-full transition-all duration-300 rounded-lg"
         style={{
-          cursor: 'pointer',
-          borderTop: '2px solid rgba(15,23,42,0.20)',
+          clipPath: 'polygon(0% 0%, calc(100% - 24px) 0%, 100% 50%, calc(100% - 24px) 100%, 0% 100%)',
+          background: `linear-gradient(90deg, ${program.fill} 0%, ${program.accent} 60%, ${program.fill} 100%)`,
+          padding: '2px',
         }}
       >
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '72px 1fr 36px',
-          gap: '20px',
-          padding: '24px 16px',
-          alignItems: 'start',
-        }}>
-          {/* Number */}
-          <div>
-            <span style={{
-              fontSize: 'clamp(26px,3vw,34px)',
-              fontWeight: 900,
-              fontFamily: '"Space Grotesk", monospace, sans-serif',
-              color: isActive ? '#C9A227' : 'rgba(15,23,42,0.80)',
-              lineHeight: 1,
-              display: 'block',
-              transition: 'color 0.3s',
-            }}>
-              {area.num}
-            </span>
-          </div>
-
-          {/* Content */}
-          <div>
-            <h3 className="font-display" style={{
-              fontSize: '20px', fontWeight: 800,
-              letterSpacing: '-0.01em',
-              color: isActive ? '#C9A227' : '#000000',
-              marginBottom: '6px', lineHeight: 1.3,
-              transition: 'color 0.2s',
-            }}>
-              {area.title}
-            </h3>
-            <p style={{ fontSize: '16px', fontWeight: 500, color: '#334155', lineHeight: 1.65, marginTop: '4px', marginBottom: isActive ? '14px' : '0' }}>
-              {area.description}
-            </p>
-            {/* Expandable detail */}
-            <div style={{
-              maxHeight: isActive ? '160px' : '0',
-              overflow: 'hidden',
-              transition: 'max-height 0.42s cubic-bezier(0.22,1,0.36,1)',
-            }}>
-              <p style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(15,23,42,0.65)', lineHeight: 1.72, paddingTop: '4px' }}>
-                {area.detail}
-              </p>
-            </div>
-          </div>
-
-          {/* Chevron */}
-          <div style={{ paddingTop: '4px' }}>
-            <span
-              className="imt-toggle"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: '30px', height: '30px', borderRadius: '50%',
-                background: isActive ? '#000000' : '#e2e8f0',
-                color: isActive ? '#ffffff' : '#0f172a',
-                fontSize: '18px', fontWeight: 700,
-                transform: isActive ? 'rotate(45deg)' : 'rotate(0deg)',
-                transition: 'transform 0.3s cubic-bezier(0.22,1,0.36,1), background-color 0.2s, color 0.2s',
-              }}
+        {/* Inner chevron body */}
+        <div
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 bg-white/95 backdrop-blur-sm transition-colors duration-200 group-hover:bg-[#FCFAF5]"
+          style={{
+            clipPath: 'polygon(0% 0%, calc(100% - 23px) 0%, 100% 50%, calc(100% - 23px) 100%, 0% 100%)',
+            padding: '20px 42px 20px 24px',
+          }}
+        >
+          {/* Left: Number & Acronym badge */}
+          <div className="flex items-center gap-3.5 shrink-0">
+            <div
+              className="flex items-center justify-center w-12 h-12 rounded-xl font-bold text-lg text-white shadow-md tracking-tight transition-transform duration-300 group-hover:scale-105"
+              style={{ backgroundColor: program.fill }}
             >
-              +
+              {program.number}
+            </div>
+            <span
+              className="inline-block text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs"
+              style={{ backgroundColor: `${program.accent}22`, color: program.fill }}
+            >
+              {program.short}
             </span>
+          </div>
+
+          {/* Center: Title & Description */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg sm:text-[19px] font-bold text-slate-900 mb-1 tracking-tight group-hover:text-amber-950 transition-colors">
+              {program.title}
+            </h3>
+            <p className="text-sm font-medium text-slate-600 leading-relaxed">
+              {program.description}
+            </p>
+          </div>
+
+          {/* Right: Prompt arrow */}
+          <div
+            className="flex items-center gap-1.5 shrink-0 font-bold text-xs tracking-wider uppercase transition-colors"
+            style={{ color: program.fill }}
+          >
+            <span>Learn More</span>
+            <span className="text-base font-bold transition-transform duration-200 group-hover:translate-x-2">→</span>
           </div>
         </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function ExpandedCard({ program, onClose, onInterested }) {
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-2xl bg-white p-7 sm:p-9 shadow-2xl border border-slate-200"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Top accent bar */}
+      <div
+        className="absolute top-0 left-0 right-0 h-2"
+        style={{ backgroundColor: program.fill }}
+      />
+
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <span
+            className="flex items-center justify-center w-10 h-10 rounded-lg font-bold text-white text-base shadow-sm"
+            style={{ backgroundColor: program.fill }}
+          >
+            {program.number}
+          </span>
+          <span
+            className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md"
+            style={{ backgroundColor: `${program.accent}22`, color: program.fill }}
+          >
+            {program.short} Track
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition"
+        >
+          ✕
+        </button>
+      </div>
+
+      <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">
+        {program.title}
+      </h3>
+
+      <p className="text-base text-slate-700 leading-relaxed mb-6 font-medium">
+        {program.description}
+      </p>
+
+      <div className="border-t border-slate-100 pt-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <p className="text-xs text-slate-500">
+          Tailored cohort programs for incubator managers, university leaders, and innovation hubs.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            onClose()
+            onInterested?.()
+          }}
+          className="shrink-0 px-6 py-3 rounded-xl font-bold text-sm text-white transition-transform duration-200 hover:scale-[1.02] shadow-md"
+          style={{ backgroundColor: program.fill }}
+        >
+          Inquire About Track →
+        </button>
       </div>
     </div>
   )
 }
 
 export default function IMT({ onInterested }) {
-  const [headingRef, headingVisible] = useScrollReveal()
-  const [ctaRef, ctaVisible] = useScrollReveal()
-  const [activeIndex, setActiveIndex] = useState(-1)
+  const [activeId, setActiveId] = useState(null)
+
+  const activeProgram = imtPrograms.find((p) => p.id === activeId) || null
+
+  const handleOpen = (id) => setActiveId(id)
+  const handleClose = () => setActiveId(null)
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') handleClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   return (
-    <section id="imt" className="section-cream" style={{ padding: '88px 0 80px' }}>
-      <style>{`
-        .imt-toggle:hover {
-          background-color: #000000 !important;
-          color: #ffffff !important;
-        }
-      `}</style>
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 40px' }}>
-
-        {/* Heading */}
-        <div
-          ref={headingRef}
-          className={`reveal ${headingVisible ? 'is-visible' : ''}`}
-          style={{ marginBottom: '52px' }}
+    <section id="imt" className="relative w-full py-20 sm:py-24" style={{ backgroundColor: '#FDFBF5' }}>
+      <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
+        
+        {/* Centralized Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: EASE_SMOOTH }}
+          className="text-center max-w-2xl mx-auto mb-10 sm:mb-12"
         >
-          <span className="eyebrow eyebrow-light" style={{ marginBottom: '14px', display: 'flex' }}>For Incubation Professionals</span>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '40px', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <h2 className="section-h2-light font-display" style={{ marginBottom: '14px' }}>
-                Incubation Management Training
-              </h2>
-              <div style={{ maxWidth: '480px' }}>
-                <p style={{
-                  fontSize: 'clamp(18px, 2vw, 20px)',
-                  fontWeight: 800,
-                  color: '#000000',
-                  lineHeight: 1.4,
-                  margin: 0,
-                }}>
-                  Strong founders need strong incubation ecosystems.
-                </p>
-                <p style={{
-                  fontSize: 'clamp(18px, 2vw, 20px)',
-                  fontWeight: 500,
-                  color: '#1e293b',
-                  lineHeight: 1.4,
-                  margin: '10px 0 0',
-                }}>
-                  IMT is the first professional development framework designed
-                  <strong style={{ fontWeight: 800, color: '#000000' }}> for people who run incubators and accelerators</strong> — not for founders.
-                </p>
-                <p style={{
-                  fontSize: 'clamp(18px, 2vw, 20px)',
-                  fontWeight: 800,
-                  color: '#000000',
-                  lineHeight: 1.4,
-                  margin: '10px 0 0',
-                }}>
-                  Five focus areas. One cohesive capability model.
-                </p>
-              </div>
-            </div>
-            {/* Stat */}
-            <div style={{
-              border: '2px solid rgba(15,23,42,0.20)',
-              borderRadius: '14px',
-              padding: '24px 28px',
-              textAlign: 'center',
-              flexShrink: 0,
-              background: 'rgba(15,23,42,0.03)',
-            }}>
-              <div style={{ fontSize: '36px', fontWeight: 900, color: '#000000', fontFamily: 'Space Grotesk, sans-serif', lineHeight: 1 }}>5</div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(15,23,42,0.60)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '6px' }}>Focus Areas</div>
-            </div>
-          </div>
-        </div>
+          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-[11px] font-bold tracking-widest uppercase text-slate-600 mb-3.5 shadow-sm">
+            For Incubation Professionals
+          </span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+            Programs Built Around Your Ecosystem
+          </h2>
+          <p className="text-[16px] sm:text-[17px] font-medium text-slate-600 leading-relaxed">
+            Three tracks for the people who run incubators, teach founders, and stage the
+            moment startups meet capital.
+          </p>
+        </motion.div>
 
-        {/* Focus list */}
-        <div style={{ borderTop: '2px solid rgba(15,23,42,0.20)', marginBottom: '36px' }}>
-          {FOCUS_AREAS.map((area, i) => (
-            <FocusRow
-              key={area.num}
-              area={area}
-              delay={i * 60}
-              isActive={activeIndex === i}
-              onToggle={() => setActiveIndex(prev => prev === i ? -1 : i)}
-            />
+        {/* Centralized Ribbon list — Swiping in one by one */}
+        <div className="flex w-full flex-col gap-5 sm:gap-6 items-center">
+          {imtPrograms.map((program, i) => (
+            <RibbonRow key={program.id} program={program} index={i} onOpen={handleOpen} />
           ))}
         </div>
-
-        {/* CTA */}
-        <div ref={ctaRef} className={`reveal ${ctaVisible ? 'is-visible' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => onInterested?.()}
-            className="btn-gold"
-          >
-            I&rsquo;m interested in IMT →
-          </button>
-          <p style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.55)', lineHeight: 1.6 }}>
-            Practice-led, not purely theoretical.
-          </p>
-        </div>
-
       </div>
+
+      {/* Modal Overlay — Smooth standard zoom and morph back */}
+      <AnimatePresence>
+        {activeProgram && (
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE_SMOOTH }}
+            onClick={handleClose}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 p-4 sm:p-6 backdrop-blur-sm"
+          >
+            <motion.div
+              layoutId={`ribbon-${activeProgram.id}`}
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{
+                layout: { duration: 0.42, ease: EASE_SMOOTH },
+                duration: 0.35,
+                ease: EASE_SMOOTH,
+              }}
+              className="w-full max-w-2xl"
+            >
+              <ExpandedCard
+                program={activeProgram}
+                onClose={handleClose}
+                onInterested={onInterested}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

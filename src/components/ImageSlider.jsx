@@ -98,24 +98,40 @@ export default function ImageSlider({ images = [], height = '200px', interval = 
                 zIndex,
                 transition: 'transform 0.62s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease',
                 pointerEvents: isCurrent ? 'auto' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#161310',
               }}
             >
+              {/* Ambient blurred backdrop to seamlessly blend aspect ratios */}
+              <img
+                src={img}
+                alt=""
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  filter: 'blur(16px) brightness(0.35)',
+                  transform: 'scale(1.12)',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* Main sharp image - fully visible with contain so nothing is cut off */}
               <img
                 src={img}
                 alt={`Hero Slide ${idx + 1}`}
                 style={{
+                  position: 'relative',
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover',
+                  objectFit: 'contain',
                   display: 'block',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(24,21,18,0.70) 0%, rgba(24,21,18,0.10) 60%, rgba(0,0,0,0) 100%)',
-                  pointerEvents: 'none',
+                  zIndex: 2,
                 }}
               />
             </div>

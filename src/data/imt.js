@@ -1,27 +1,38 @@
-export const imtFocusAreas = [
+// data/imt.js
+// Content for the three program ribbons rendered by components/IMT.jsx.
+// `accent`  = bright tone used on the pointer block border + number + expanded badge
+// `fill`    = deeper tone used as the ribbon body background (kept dark enough
+//             for AA-contrast white text at the sizes used here)
+
+export const imtPrograms = [
   {
-    code: 'FOCUS 01',
-    title: 'Strategy & Governance',
-    description: 'Set direction and structure that outlast any one grant cycle.',
+    id: 'imt',
+    number: '01',
+    short: 'IMT',
+    title: 'Incubation Management Training',
+    description:
+      'Equip leaders with frameworks to scale early-stage ventures and manage incubator ecosystems effectively.',
+    accent: '#C9A227',
+    fill: '#8A6A16',
   },
   {
-    code: 'FOCUS 02',
-    title: 'Startup Support',
-    description: 'Screening, mentoring and programming that actually moves founders forward.',
+    id: 'fedp',
+    number: '02',
+    short: 'FEDP',
+    title: 'Faculty Entrepreneurship Development Program',
+    description:
+      'Empower academic faculty to foster startup culture, commercialize research, and mentor student innovators.',
+    accent: '#4B7A62',
+    fill: '#2F4F3F',
   },
   {
-    code: 'FOCUS 03',
-    title: 'Partnerships',
-    description: 'Corporate, mentor and investor networks your startups can actually use.',
-  },
-  {
-    code: 'FOCUS 04',
-    title: 'Sustainability',
-    description: "Funding and operating models that don't collapse when the grant ends.",
-  },
-  {
-    code: 'FOCUS 05',
-    title: 'Impact',
-    description: 'Proof that your ecosystem is producing outcomes, not just activity.',
+    id: 'add',
+    number: '03',
+    short: 'ADD',
+    title: 'Accelerator Demo Day',
+    description:
+      'Connect high-growth cohorts with angel investors, VCs, and industry partners for high-stakes pitching.',
+    accent: '#C1502E',
+    fill: '#8C381D',
   },
 ]

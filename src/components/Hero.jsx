@@ -33,32 +33,33 @@ export default function Hero() {
       >
         <div className="grid md:grid-cols-12 gap-10 items-center">
           <div className="md:col-span-7">
-            <div style={{ marginBottom: '20px' }}>
-              <span style={{ fontSize: '18px', fontWeight: 600, color: 'rgba(255,255,255,0.78)', letterSpacing: '0.04em' }}>
+            <div style={{ marginBottom: '18px' }}>
+              <span style={{ fontSize: '19px', fontWeight: 600, color: '#C9A227', letterSpacing: '0.04em' }}>
                 Global Acceleration Lab
               </span>
             </div>
 
             <h1
               className="font-display font-bold"
-              style={{ fontSize: 'clamp(52px, 7vw, 80px)', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '20px' }}
+              style={{ fontSize: 'clamp(54px, 7.5vw, 84px)', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '22px' }}
             >
               Build <span style={{ color: '#C9A227' }}>what</span>
               <br />
               matters.
             </h1>
 
-            <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.78)', fontWeight: 500, marginBottom: '20px' }}>
+            <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.92)', fontWeight: 600, marginBottom: '18px', letterSpacing: '-0.01em' }}>
               To you. To others. To the future.
             </p>
 
             <p
               style={{
-                fontSize: '14px',
-                color: 'rgba(255,255,255,0.55)',
+                fontSize: '17px',
+                color: 'rgba(255,255,255,0.80)',
                 lineHeight: 1.65,
-                maxWidth: '440px',
-                marginBottom: '14px',
+                maxWidth: '540px',
+                marginBottom: '18px',
+                fontWeight: 400,
               }}
             >
               Global Acceleration Lab is where the Innovation Triple Helix converges &mdash;
@@ -67,16 +68,17 @@ export default function Hero() {
 
             <div
               style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                fontSize: '11px', color: 'rgba(255,255,255,0.35)',
+                display: 'flex', alignItems: 'center', gap: '10px',
+                fontSize: '13px', color: 'rgba(255,255,255,0.60)',
                 marginBottom: '32px',
+                fontWeight: 500,
               }}
             >
-              <span style={{ display: 'inline-block', width: '28px', height: '1px', background: 'rgba(255,255,255,0.2)' }} />
+              <span style={{ display: 'inline-block', width: '32px', height: '2px', background: '#C9A227' }} />
               Innovation &middot; Academia &middot; Industry &middot; Government
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={scrollToForm}
@@ -84,16 +86,17 @@ export default function Hero() {
                   backgroundColor: '#C9A227',
                   color: '#fff',
                   border: 'none',
-                  padding: '11px 22px',
-                  borderRadius: '9px',
-                  fontSize: '14px',
-                  fontWeight: 600,
+                  padding: '13px 26px',
+                  borderRadius: '10px',
+                  fontSize: '15.5px',
+                  fontWeight: 700,
                   cursor: 'pointer',
-                  transition: 'background 0.2s',
+                  transition: 'background 0.2s, transform 0.15s',
                   fontFamily: 'inherit',
+                  boxShadow: '0 4px 14px rgba(201,162,39,0.3)',
                 }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#B8880C'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#C9A227'}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#B8880C'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#C9A227'; e.currentTarget.style.transform = 'translateY(0)' }}
               >
                 I&rsquo;m a GAL Builder &rarr;
               </button>
@@ -102,19 +105,19 @@ export default function Hero() {
                 href="#pathways"
                 style={{
                   backgroundColor: 'transparent',
-                  color: 'rgba(255,255,255,0.85)',
-                  border: '1px solid rgba(255,255,255,0.22)',
-                  padding: '11px 22px',
-                  borderRadius: '9px',
-                  fontSize: '14px',
+                  color: 'rgba(255,255,255,0.90)',
+                  border: '1px solid rgba(255,255,255,0.28)',
+                  padding: '13px 26px',
+                  borderRadius: '10px',
+                  fontSize: '15.5px',
                   fontWeight: 600,
                   cursor: 'pointer',
                   textDecoration: 'none',
-                  transition: 'background 0.2s, border-color 0.2s',
+                  transition: 'background 0.2s, border-color 0.2s, transform 0.15s',
                   display: 'inline-block',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)' }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.45)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)'; e.currentTarget.style.transform = 'translateY(0)' }}
               >
                 See the pathways
               </a>
@@ -131,32 +134,33 @@ export default function Hero() {
                 borderRadius: '16px',
                 padding: '28px 30px',
                 border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 12px 36px rgba(0,0,0,0.35)',
               }}
             >
-              <ImageSlider images={heroImages} height="190px" />
+              <ImageSlider images={heroImages} height="215px" />
 
               <div
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '7px',
-                  fontSize: '11px', fontWeight: 700,
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  fontSize: '12px', fontWeight: 700,
                   color: '#C9A227',
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
                   marginBottom: '14px',
                 }}
               >
-                <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#C9A227' }} />
+                <span style={{ display: 'inline-block', width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#C9A227' }} />
                 Start Building
               </div>
 
               <p
                 className="font-display font-bold"
-                style={{ fontSize: '22px', lineHeight: 1.3, color: '#fff', marginBottom: '12px' }}
+                style={{ fontSize: '24px', lineHeight: 1.25, color: '#fff', marginBottom: '12px' }}
               >
-                What matters enough to you to build it?
+                What are you building?
               </p>
 
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: '22px' }}>
+              <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, marginBottom: '22px', fontWeight: 400 }}>
                 No forms about who you are. Just tell us what you&rsquo;re trying to build &mdash;
                 we&rsquo;ll ask the rest as we go.
               </p>
@@ -169,16 +173,17 @@ export default function Hero() {
                   backgroundColor: '#C9A227',
                   color: '#fff',
                   border: 'none',
-                  padding: '13px',
-                  borderRadius: '9px',
-                  fontSize: '14px',
-                  fontWeight: 600,
+                  padding: '14px',
+                  borderRadius: '10px',
+                  fontSize: '15.5px',
+                  fontWeight: 700,
                   cursor: 'pointer',
-                  transition: 'background 0.2s',
+                  transition: 'background 0.2s, transform 0.15s',
                   fontFamily: 'inherit',
+                  boxShadow: '0 4px 14px rgba(201,162,39,0.25)',
                 }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#B8880C'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#C9A227'}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#B8880C'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#C9A227'; e.currentTarget.style.transform = 'translateY(0)' }}
               >
                 Tell GAL &rarr;
               </button>

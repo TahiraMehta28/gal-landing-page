@@ -63,10 +63,10 @@ export default function FAQItem({ faq, isOpen, onToggle }) {
 
           <span
             style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              color: isOpen ? '#fff' : 'rgba(255,255,255,0.72)',
-              lineHeight: 1.45,
+              fontSize: '16.5px',
+              fontWeight: 700,
+              color: isOpen ? '#fff' : 'rgba(255,255,255,0.85)',
+              lineHeight: 1.4,
               transition: 'color 0.2s',
             }}
           >
@@ -121,9 +121,10 @@ export default function FAQItem({ faq, isOpen, onToggle }) {
           />
           <p
             style={{
-              fontSize: '14px',
-              color: 'rgba(255,255,255,0.60)',
-              lineHeight: 1.78,
+              fontSize: '15.5px',
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.92)',
+              lineHeight: 1.7,
               margin: 0,
               paddingLeft: '42px',
             }}
