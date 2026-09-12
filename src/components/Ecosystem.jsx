@@ -67,53 +67,57 @@ function Panel({ panel, delay }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         style={{
-          background: panel.emphasis ? 'rgba(201,162,39,0.10)' : 'rgba(255,255,255,0.04)',
+          background: panel.emphasis ? 'rgba(201,162,39,0.12)' : 'rgba(255,255,255,0.05)',
           border: panel.emphasis
-            ? '1px solid rgba(201,162,39,0.35)'
-            : hovered ? '1px solid rgba(201,162,39,0.25)' : '1px solid rgba(255,255,255,0.08)',
+            ? '1.5px solid rgba(201,162,39,0.45)'
+            : hovered ? '1.5px solid rgba(201,162,39,0.35)' : '1.5px solid rgba(255,255,255,0.10)',
           borderRadius: '16px',
-          padding: '28px 24px',
+          padding: '28px 22px',
           transform: panel.emphasis ? 'none' : hovered ? 'translateY(-5px)' : 'translateY(0)',
           transition: 'transform 0.30s cubic-bezier(0.22,1,0.36,1), border-color 0.30s, box-shadow 0.30s',
           boxShadow: hovered && !panel.emphasis ? '0 20px 48px rgba(0,0,0,0.30)' : 'none',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'space-between',
         }}
       >
-        {/* Role label */}
-        <p style={{
-          fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: panel.emphasis ? '#C9A227' : 'rgba(255,255,255,0.35)',
-          marginBottom: '12px',
-        }}>
-          {panel.role}
-        </p>
+        <div>
+          {/* Role label */}
+          <p style={{
+            fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: panel.emphasis ? '#C9A227' : 'rgba(255,255,255,0.65)',
+            marginBottom: '12px',
+          }}>
+            {panel.role}
+          </p>
 
-        {/* Label */}
-        <h3 className="font-display" style={{
-          fontSize: '22px', fontWeight: 700,
-          color: panel.emphasis ? '#C9A227' : '#fff',
-          marginBottom: '12px', lineHeight: 1.2,
-        }}>
-          {panel.label}
-        </h3>
+          {/* Label */}
+          <h3 className="font-display" style={{
+            fontSize: '24px', fontWeight: 700,
+            color: panel.emphasis ? '#C9A227' : '#ffffff',
+            marginBottom: '14px', lineHeight: 1.2,
+          }}>
+            {panel.label}
+          </h3>
 
-        {/* Description */}
-        <p style={{
-          fontSize: '13px', lineHeight: 1.72,
-          color: 'rgba(255,255,255,0.52)',
-          marginBottom: '20px',
-        }}>
-          {panel.description}
-        </p>
+          {/* Description */}
+          <p style={{
+            fontSize: '15px', lineHeight: 1.68,
+            color: 'rgba(255,255,255,0.80)',
+            fontWeight: 400,
+            marginBottom: '24px',
+          }}>
+            {panel.description}
+          </p>
+        </div>
 
         {/* Detail list */}
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {panel.detail.map((d) => (
-            <li key={d} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
-              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#C9A227', flexShrink: 0, marginTop: '6px', opacity: 0.8 }} />
+            <li key={d} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.88)', lineHeight: 1.5 }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#C9A227', flexShrink: 0, marginTop: '7px', opacity: 0.95 }} />
               <span>{d}</span>
             </li>
           ))}
@@ -128,13 +132,13 @@ export default function Ecosystem() {
 
   return (
     <section id="triple-helix" className="section-dark" style={{ padding: '88px 0 80px' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 40px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 32px' }}>
 
         {/* Heading */}
         <div
           ref={headingRef}
           className={`reveal ${headingVisible ? 'is-visible' : ''}`}
-          style={{ marginBottom: '52px', maxWidth: '600px' }}
+          style={{ marginBottom: '52px', maxWidth: '640px' }}
         >
           <span className="eyebrow eyebrow-dark" style={{ marginBottom: '14px', display: 'flex' }}>The Triple Helix</span>
           <h2 className="section-h2-dark font-display" style={{ marginBottom: '14px' }}>
@@ -142,14 +146,14 @@ export default function Ecosystem() {
             <br />
             <span className="gold">The ecosystem brings the rest.</span>
           </h2>
-          <p className="body-dark">
+          <p className="body-dark" style={{ fontSize: '17px', lineHeight: 1.65, color: 'rgba(255,255,255,0.72)' }}>
             GAL brings Academia, Industry and Government together around the builder — not the other way round.
             Most ecosystems ask builders to navigate them. GAL inverts that.
           </p>
         </div>
 
         {/* 4-panel grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', alignItems: 'stretch' }}>
           {PANELS.map((panel, i) => (
             <Panel key={panel.id} panel={panel} delay={i * 100} />
           ))}

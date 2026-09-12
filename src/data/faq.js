@@ -10,7 +10,7 @@ export const faqs = [
   {
     id: 'imt',
     question: 'Who is IMT for?',
-    answer: `Incubation Management Training is designed exclusively for incubator and accelerator staff who want stronger strategy, governance and startup support systems \u2014 not for individual founders. If you run a program, manage a portfolio, or design incubation programming, IMT gives you the professional framework to do it better. It is practice-led, not purely theoretical.`,
+    answer: `Incubation Management Training is designed exclusively for incubator and accelerator professionals who want stronger strategy, governance and startup support systems \u2014 not for individual founders. If you run a program, manage a portfolio, or design incubation programming, IMT gives you the professional framework to do it better. It is practice-led, not purely theoretical.`,
     nodeTitle: 'IMT',
     nodeIcon: '\u{1F393}',
   },

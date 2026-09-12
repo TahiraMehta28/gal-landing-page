@@ -22,9 +22,9 @@ export default function App() {
       <Hero />
       <Pathways onSelectPathway={handleSelectPathway} />
       <Ecosystem />
-      <IMT onInterested={handleImtInterest} />
-      <DiscoveryForm ref={formRef} />
       <FAQ />
+      <DiscoveryForm ref={formRef} />
+      <IMT onInterested={handleImtInterest} />
       <Footer />
     </>
   )

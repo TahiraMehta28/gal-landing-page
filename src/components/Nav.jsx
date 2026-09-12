@@ -4,8 +4,8 @@ const LINKS = [
   { id: 'hero', label: 'GAL' },
   { id: 'pathways', label: 'Pathways', hideOn: 'sm' },
   { id: 'triple-helix', label: 'Ecosystem', hideOn: 'md' },
-  { id: 'imt', label: 'IMT', hideOn: 'md' },
   { id: 'faq', label: 'FAQ', hideOn: 'sm' },
+  { id: 'imt', label: 'IMT', hideOn: 'md' },
 ]
 
 export default function Nav() {

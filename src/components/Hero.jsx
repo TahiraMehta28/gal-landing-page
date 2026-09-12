@@ -1,5 +1,14 @@
 import useScrollReveal from '../hooks/useScrollReveal'
 import HeroCanvas from './HeroCanvas'
+import ImageSlider from './ImageSlider'
+
+// Dynamically import any image placed into src/assets/images directory
+const imageModules = import.meta.glob('../assets/images/*.{png,jpg,jpeg,webp,svg,gif,PNG,JPG,JPEG,WEBP,SVG,GIF}', {
+  eager: true,
+  import: 'default',
+})
+
+const heroImages = Object.values(imageModules)
 
 export default function Hero() {
   const [textRef, textVisible] = useScrollReveal()
@@ -15,27 +24,21 @@ export default function Hero() {
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{ backgroundColor: '#181512', color: '#ffffff' }}
     >
-      {/* Animated bokeh orbs */}
       <HeroCanvas />
 
-      {/* Content grid — no extra overlay, let the canvas show through naturally */}
       <div
         ref={textRef}
         className={`relative z-10 w-full max-w-6xl mx-auto px-8 md:px-14 reveal ${textVisible ? 'is-visible' : ''}`}
         style={{ paddingTop: '120px', paddingBottom: '120px' }}
       >
         <div className="grid md:grid-cols-12 gap-10 items-center">
-
-          {/* ── Left Column ───────────────────────────── */}
           <div className="md:col-span-7">
-            {/* Badge */}
             <div style={{ marginBottom: '20px' }}>
               <span style={{ fontSize: '18px', fontWeight: 600, color: 'rgba(255,255,255,0.78)', letterSpacing: '0.04em' }}>
                 Global Acceleration Lab
               </span>
             </div>
 
-            {/* Headline */}
             <h1
               className="font-display font-bold"
               style={{ fontSize: 'clamp(52px, 7vw, 80px)', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '20px' }}
@@ -45,14 +48,10 @@ export default function Hero() {
               matters.
             </h1>
 
-            {/* Subline */}
-            <p
-              style={{ fontSize: '20px', color: 'rgba(255,255,255,0.78)', fontWeight: 500, marginBottom: '20px' }}
-            >
+            <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.78)', fontWeight: 500, marginBottom: '20px' }}>
               To you. To others. To the future.
             </p>
 
-            {/* Body */}
             <p
               style={{
                 fontSize: '14px',
@@ -66,7 +65,6 @@ export default function Hero() {
               Academia, Industry and Government &mdash; around the people who build a better future.
             </p>
 
-            {/* Innovation line */}
             <div
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
@@ -78,9 +76,9 @@ export default function Hero() {
               Innovation &middot; Academia &middot; Industry &middot; Government
             </div>
 
-            {/* CTA Buttons */}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button
+                type="button"
                 onClick={scrollToForm}
                 style={{
                   backgroundColor: '#C9A227',
@@ -123,7 +121,6 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* ── Right Card ────────────────────────────── */}
           <div
             ref={cardRef}
             className={`md:col-span-5 slide-in ${cardVisible ? 'is-visible' : ''}`}
@@ -136,7 +133,8 @@ export default function Hero() {
                 border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              {/* Card badge */}
+              <ImageSlider images={heroImages} height="190px" />
+
               <div
                 style={{
                   display: 'flex', alignItems: 'center', gap: '7px',
@@ -151,7 +149,6 @@ export default function Hero() {
                 Start Building
               </div>
 
-              {/* Card heading */}
               <p
                 className="font-display font-bold"
                 style={{ fontSize: '22px', lineHeight: 1.3, color: '#fff', marginBottom: '12px' }}
@@ -159,14 +156,13 @@ export default function Hero() {
                 What matters enough to you to build it?
               </p>
 
-              {/* Card body */}
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: '22px' }}>
                 No forms about who you are. Just tell us what you&rsquo;re trying to build &mdash;
                 we&rsquo;ll ask the rest as we go.
               </p>
 
-              {/* Card CTA */}
               <button
+                type="button"
                 onClick={scrollToForm}
                 style={{
                   width: '100%',
@@ -188,11 +184,9 @@ export default function Hero() {
               </button>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Bottom wave transitioning into cream body */}
       <div
         style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
