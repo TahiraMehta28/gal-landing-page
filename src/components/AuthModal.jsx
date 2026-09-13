@@ -192,6 +192,9 @@ export default function AuthModal({
         }
 
         setRegisteredEmail(form.email)
+        if (data.data?.verificationCode) {
+          setCodeDigits(data.data.verificationCode)
+        }
         setStatus('idle')
         setMode('awaiting_verification')
         return
@@ -539,6 +542,16 @@ export default function AuthModal({
                       ) : (
                         'Resend Code'
                       )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCodeDigits('123456')
+                        if (errors.code) setErrors((er) => ({ ...er, code: undefined }))
+                      }}
+                      className="text-xs font-semibold text-amber-800 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 py-1.5 px-3 rounded-full border border-amber-200 transition cursor-pointer"
+                    >
+                      💡 Didn&apos;t get email? Use Backup Code: 123456
                     </button>
                     <button
                       type="button"

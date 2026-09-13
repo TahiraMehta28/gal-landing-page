@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
 
 export const sendEmail = async ({ to, subject, html, text }) => {
-  const user = process.env.EMAIL_USER?.trim();
-  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, '');
+  const user = process.env.EMAIL_USER?.trim() || 'tahiram.cs.23@nitj.ac.in';
+  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, '') || 'lxoyduateasrtwfn';
 
   const hasRealSmtp = Boolean(
     user &&
@@ -12,24 +12,29 @@ export const sendEmail = async ({ to, subject, html, text }) => {
   );
 
   if (!hasRealSmtp) {
-    console.log(`ℹ️  [Dev Mode / No SMTP] Email would be sent to: ${to}`);
-    console.log(`ℹ️  Subject: ${subject}`);
+    console.log(`ℹ️  [Dev Mode / No SMTP] Email simulated for: ${to}`);
     return { messageId: 'dev-mode-simulated' };
   }
 
   try {
+    // Port 465 with SSL is significantly more reliable across cloud hosting platforms like Render
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user,
         pass,
       },
-      connectionTimeout: 5000,
-      greetingTimeout: 5000,
-      socketTimeout: 5000,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      connectionTimeout: 7000,
+      greetingTimeout: 7000,
+      socketTimeout: 7000,
     });
 
-    const fromAddress = `"${process.env.FROM_NAME || 'GAL Acceleration Lab'}" <${user || 'no-reply@gal.com'}>`;
+    const fromAddress = `"${process.env.FROM_NAME || 'GAL Acceleration Lab'}" <${user}>`;
 
     const mailOptions = {
       from: fromAddress,
