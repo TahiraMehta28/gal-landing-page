@@ -1,4 +1,4 @@
-export default function StepConsent({ step, values, onToggle, onSubmit }) {
+export default function StepConsent({ step, values, onToggle, onSubmit, isSubmitting = false }) {
   return (
     <div>
       <h3 className="font-display" style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '5px' }}>
@@ -36,8 +36,20 @@ export default function StepConsent({ step, values, onToggle, onSubmit }) {
           )
         })}
       </div>
-      <button type="button" onClick={onSubmit} className="btn-gold" style={{ width: '100%', justifyContent: 'center', padding: '13px' }}>
-        Count me in →
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={isSubmitting}
+        className="btn-gold"
+        style={{
+          width: '100%',
+          justifyContent: 'center',
+          padding: '13px',
+          opacity: isSubmitting ? 0.7 : 1,
+          cursor: isSubmitting ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {isSubmitting ? 'Saving response...' : 'Count me in →'}
       </button>
     </div>
   )
