@@ -38,6 +38,20 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/tell-gal', tellGalRoutes);
 
+// Root status endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    message: 'GAL Backend API is running successfully',
+    database: 'Connected to MongoDB Atlas',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      tellGal: '/api/tell-gal',
+    },
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Auth API server is running smoothly' });
