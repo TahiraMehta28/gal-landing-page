@@ -7,49 +7,43 @@ export const sendEmail = async ({ to, subject, html, text }) => {
   const hasRealSmtp = Boolean(
     user &&
     pass &&
-    !user.includes('your_email')
+    !user.includes('your_email') &&
+    pass.length >= 8
   );
 
-  let transporter;
+  if (!hasRealSmtp) {
+    console.log(`ℹ️  [Dev Mode / No SMTP] Email would be sent to: ${to}`);
+    console.log(`ℹ️  Subject: ${subject}`);
+    return { messageId: 'dev-mode-simulated' };
+  }
 
-  if (hasRealSmtp) {
-    // Verified Google / Gmail SMTP transporter
-    transporter = nodemailer.createTransport({
+  try {
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user,
         pass,
       },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 5000,
     });
-  } else {
-    // Fallback development test transporter
-    console.log('ℹ️  No external SMTP configured in .env. Creating test email transporter...');
-    const testAccount = await nodemailer.createTestAccount();
-    transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
+
+    const fromAddress = `"${process.env.FROM_NAME || 'GAL Acceleration Lab'}" <${user || 'no-reply@gal.com'}>`;
+
+    const mailOptions = {
+      from: fromAddress,
+      to,
+      subject,
+      text,
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✉️  Real Email successfully delivered to: ${to} (Message ID: ${info.messageId})`);
+    return { messageId: info.messageId };
+  } catch (error) {
+    console.warn(`⚠️  Email delivery warning for ${to}:`, error.message);
+    return { error: error.message };
   }
-
-  const fromAddress = `"${process.env.FROM_NAME || 'GAL Acceleration Lab'}" <${user || 'no-reply@gal.com'}>`;
-
-  const mailOptions = {
-    from: fromAddress,
-    to,
-    subject,
-    text,
-    html,
-  };
-
-  const info = await transporter.sendMail(mailOptions);
-  console.log(`✉️  Real Email successfully delivered to: ${to} (Message ID: ${info.messageId})`);
-
-  return {
-    messageId: info.messageId,
-  };
 };

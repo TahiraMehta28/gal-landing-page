@@ -71,8 +71,11 @@ export const signup = async (req, res) => {
     const { code: verificationCode } = user.getVerificationToken();
     await user.save();
 
-    // Send confirmation email with ONLY the 6-digit code
-    await sendEmail({
+    // Log verification code clearly in server logs
+    console.log(`🔑 Verification code for ${user.email} is: [${verificationCode}]`);
+
+    // Send confirmation email asynchronously without blocking the signup HTTP response
+    sendEmail({
       to: user.email,
       subject: 'Your Verification Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour 6-digit verification code is: ${verificationCode}\n\nEnter this code in the signup screen to complete your registration.\n\nThis code will expire in 24 hours.`,
@@ -99,7 +102,7 @@ export const signup = async (req, res) => {
           </p>
         </div>
       `,
-    });
+    }).catch(err => console.warn('Background sendEmail error:', err.message));
 
     return res.status(201).json({
       success: true,
@@ -241,7 +244,10 @@ export const resendVerification = async (req, res) => {
     const { code: verificationCode } = user.getVerificationToken();
     await user.save();
 
-    await sendEmail({
+    // Log verification code clearly in server logs
+    console.log(`🔑 Resent verification code for ${user.email} is: [${verificationCode}]`);
+
+    sendEmail({
       to: user.email,
       subject: 'Your New Verification Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour new 6-digit verification code is: ${verificationCode}\n\nEnter this code in the signup screen to complete your registration.\n\nThis code will expire in 24 hours.`,
@@ -268,7 +274,7 @@ export const resendVerification = async (req, res) => {
           </p>
         </div>
       `,
-    });
+    }).catch(err => console.warn('Background sendEmail error:', err.message));
 
     return res.status(200).json({
       success: true,
@@ -357,7 +363,10 @@ export const forgotPassword = async (req, res) => {
     const { token: resetToken, code: resetCode } = user.getResetPasswordToken();
     await user.save();
 
-    await sendEmail({
+    // Log reset code clearly in server logs
+    console.log(`🔑 Password reset code for ${user.email} is: [${resetCode}]`);
+
+    sendEmail({
       to: user.email,
       subject: 'Password Reset Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour 6-digit password reset code is: ${resetCode}\n\nEnter this code in the password reset form along with your new password.\n\nThis code will expire in 1 hour.`,
@@ -384,7 +393,7 @@ export const forgotPassword = async (req, res) => {
           </p>
         </div>
       `,
-    });
+    }).catch(err => console.warn('Background sendEmail error:', err.message));
 
     return res.status(200).json({
       success: true,
