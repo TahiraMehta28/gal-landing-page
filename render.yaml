@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: gal-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: COLLECTION_NAME
+        value: GALL
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: CLIENT_URL
+        value: '*'
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: FROM_NAME
+        value: GAL Acceleration Lab
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
