@@ -80,6 +80,7 @@ export const signup = async (req, res) => {
     console.log(`📧 Dispatching signup OTP verification email to: ${user.email}`);
     const emailResult = await sendEmail({
       to: user.email,
+      clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Your Verification Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour 6-digit verification code is: ${verificationCode}\n\nEnter this code in the signup screen to complete your registration.\n\nThis code will expire in 24 hours.`,
       html: `
@@ -289,6 +290,7 @@ export const resendVerification = async (req, res) => {
     console.log(`📧 Resending verification OTP to: ${user.email}`);
     const emailResult = await sendEmail({
       to: user.email,
+      clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Your New Verification Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour new 6-digit verification code is: ${verificationCode}\n\nEnter this code in the signup screen to complete your registration.\n\nThis code will expire in 24 hours.`,
       html: `
@@ -414,6 +416,7 @@ export const forgotPassword = async (req, res) => {
     console.log(`📧 Sending password reset code email to: ${user.email}`);
     const emailResult = await sendEmail({
       to: user.email,
+      clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Password Reset Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour 6-digit password reset code is: ${resetCode}\n\nEnter this code in the password reset form along with your new password.\n\nThis code will expire in 1 hour.`,
       html: `
@@ -546,6 +549,7 @@ export const resetPassword = async (req, res) => {
     console.log(`📧 Sending password reset security alert to: ${user.email}`);
     const emailResult = await sendEmail({
       to: user.email,
+      clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Security Alert: Password Updated - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour password for GAL Acceleration Lab was successfully updated.\n\nIf you made this change, no action is needed.\n\nIf you did NOT make this change, please contact support or reset your password immediately.`,
       html: `
@@ -688,6 +692,7 @@ export const updateProfile = async (req, res) => {
       console.log(`📧 Sending password change security alert to: ${updatedUser.email}`);
       const emailResult = await sendEmail({
         to: updatedUser.email,
+        clientOrigin: req.headers.origin || req.headers.referer,
         subject: 'Security Alert: Password Changed - GAL Acceleration Lab',
         text: `Hello ${updatedUser.name},\n\nYour password for GAL Acceleration Lab was successfully changed from your profile.\n\nIf you made this change, no action is needed.\n\nIf you did NOT make this change, please contact support or reset your password immediately.`,
         html: `
