@@ -176,8 +176,8 @@ export default function IMT({ onInterested }) {
     <section id="imt" className="relative w-full py-20 sm:py-24" style={{ backgroundColor: '#FDFBF5' }}>
       <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
         
-        {/* Centralized Heading */}
-        <motion.div
+        {/* Centralized Heading — temporarily hidden */}
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
@@ -194,7 +194,7 @@ export default function IMT({ onInterested }) {
             Three tracks for the people who run incubators, teach founders, and stage the
             moment startups meet capital.
           </p>
-        </motion.div>
+        </motion.div> */}
 
         {/* Centralized Ribbon list — Swiping in one by one */}
         <div className="flex w-full flex-col gap-5 sm:gap-6 items-center">
