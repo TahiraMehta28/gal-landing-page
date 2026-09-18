@@ -106,7 +106,7 @@ export default function App() {
       <Ecosystem />
       <FAQ />
       <DiscoveryForm ref={formRef} user={user} />
-      <IMT onInterested={handleImtInterest} />
+      {/* <IMT onInterested={handleImtInterest} /> */}{/* IMT section temporarily hidden */}
       <Footer />
 
       {/* Authentication Modal (Sign In, Sign Up, Confirm Email, Forgot & Reset Password) */}
