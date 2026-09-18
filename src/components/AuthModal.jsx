@@ -39,7 +39,6 @@ const EMPTY_FORM = {
   name: '',
   email: '',
   password: '',
-  currentPassword: '',
   confirm: '',
   newPassword: '',
   confirmPassword: '',
@@ -71,9 +70,6 @@ function validate(mode, form) {
   if (mode === 'reset_password_code' || mode === 'reset_password') {
     if (mode === 'reset_password_code' && (!form.code?.trim() || form.code.trim().length !== 6)) {
       errors.code = 'Enter the 6-digit code sent to your email'
-    }
-    if (mode === 'reset_password_code' && !form.currentPassword) {
-      errors.currentPassword = 'Enter your current (old) password'
     }
     if (!form.newPassword) errors.newPassword = 'Enter a new password'
     else if (form.newPassword.length < 8) errors.newPassword = 'Must be at least 8 characters'
@@ -148,7 +144,6 @@ export default function AuthModal({
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [showPw, setShowPw] = useState(false)
-  const [showOldPw, setShowOldPw] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [status, setStatus] = useState('idle') // 'idle' | 'loading' | 'success'
   const [registeredEmail, setRegisteredEmail] = useState('')
@@ -286,8 +281,6 @@ export default function AuthModal({
           body: JSON.stringify({
             email: (registeredEmail || form.email).trim().toLowerCase(),
             code: form.code.trim(),
-            oldPassword: form.currentPassword,
-            currentPassword: form.currentPassword,
             password: form.newPassword,
           }),
         })
@@ -780,22 +773,9 @@ export default function AuthModal({
                         </div>
                       )}
 
-                      {/* Reset Password Form Fields (Old Password + New Password + Confirm Password) */}
+                      {/* Reset Password Form Fields (New Password + Confirm Password) */}
                       {(mode === 'reset_password' || mode === 'reset_password_code') && (
                         <>
-                          {mode === 'reset_password_code' && (
-                            <PasswordField
-                              label="current (old) password"
-                              name="currentPassword"
-                              value={form.currentPassword}
-                              onChange={handleChange}
-                              error={errors.currentPassword}
-                              show={showOldPw}
-                              onToggleShow={() => setShowOldPw((s) => !s)}
-                              placeholder="Current (old) password"
-                              autoComplete="current-password"
-                            />
-                          )}
                           <PasswordField
                             label="new password"
                             name="newPassword"

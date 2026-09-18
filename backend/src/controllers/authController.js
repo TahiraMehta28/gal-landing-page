@@ -482,7 +482,7 @@ export const resetPassword = async (req, res) => {
         });
       }
     } else if (email) {
-      user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+      user = await User.findOne({ email: email.toLowerCase() });
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -490,37 +490,27 @@ export const resetPassword = async (req, res) => {
         });
       }
 
-      // Check for current/old password AND reset code
-      const oldPassword = req.body.currentPassword || req.body.oldPassword;
-
-      if (code) {
-        const cleanCode = String(code).replace(/\D/g, '').trim();
-        const isValidCode =
-          user.resetPasswordCode &&
-          user.resetPasswordCode === cleanCode &&
-          user.resetPasswordExpire > Date.now();
-        if (!isValidCode) {
-          return res.status(400).json({
-            success: false,
-            message: 'Invalid or expired 6-digit reset code.',
-          });
-        }
-      }
-
-      if (oldPassword) {
-        const isMatch = await user.matchPassword(oldPassword);
-        if (!isMatch) {
-          return res.status(400).json({
-            success: false,
-            message: 'Incorrect current (old) password.',
-          });
-        }
-      }
-
-      if (!code && !oldPassword) {
+      if (!code) {
         return res.status(400).json({
           success: false,
           message: 'Please provide the 6-digit verification code sent to your email.',
+        });
+      }
+
+      const cleanCode = String(code).replace(/\D/g, '').trim();
+      const storedCode = (user.resetPasswordCode || '').toString().trim();
+      console.log(`🔐 Reset password code check for ${user.email} -> Entered: [${cleanCode}] Stored: [${storedCode}] Expire: ${user.resetPasswordExpire}`);
+
+      const isValidCode =
+        storedCode &&
+        storedCode === cleanCode &&
+        user.resetPasswordExpire &&
+        user.resetPasswordExpire > Date.now();
+
+      if (!isValidCode) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or expired 6-digit reset code.',
         });
       }
     } else {
