@@ -59,6 +59,8 @@ app.use(express.json());
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+app.use('/', authRoutes);
 app.use('/api/tell-gal', tellGalRoutes);
 
 // Root status endpoint

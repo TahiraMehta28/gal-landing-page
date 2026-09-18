@@ -505,20 +505,14 @@ export const resetPassword = async (req, res) => {
         });
       }
 
-      // Check for current/old password or reset code
+      // Check for current/old password AND reset code
       const oldPassword = req.body.currentPassword || req.body.oldPassword;
-      if (oldPassword) {
-        const isMatch = await user.matchPassword(oldPassword);
-        if (!isMatch) {
-          return res.status(400).json({
-            success: false,
-            message: 'Incorrect current password. Please enter your valid old password.',
-          });
-        }
-      } else if (code) {
+
+      if (code) {
+        const cleanCode = String(code).replace(/\D/g, '').trim();
         const isValidCode =
           user.resetPasswordCode &&
-          user.resetPasswordCode === code.trim() &&
+          user.resetPasswordCode === cleanCode &&
           user.resetPasswordExpire > Date.now();
         if (!isValidCode) {
           return res.status(400).json({
@@ -526,10 +520,22 @@ export const resetPassword = async (req, res) => {
             message: 'Invalid or expired 6-digit reset code.',
           });
         }
-      } else {
+      }
+
+      if (oldPassword) {
+        const isMatch = await user.matchPassword(oldPassword);
+        if (!isMatch) {
+          return res.status(400).json({
+            success: false,
+            message: 'Incorrect current (old) password.',
+          });
+        }
+      }
+
+      if (!code && !oldPassword) {
         return res.status(400).json({
           success: false,
-          message: 'Please provide either your current (old) password or the 6-digit reset code.',
+          message: 'Please provide the 6-digit verification code sent to your email.',
         });
       }
     } else {
