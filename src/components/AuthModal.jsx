@@ -15,8 +15,8 @@ import {
 
 import { AUTH_API_URL as API_URL } from '../config/api'
 
-// Resilient fetch wrapper with 15s timeout to prevent infinite spinners on sleeping cloud backends
-async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+// Resilient fetch wrapper with 30s timeout to prevent premature aborts on sleeping cloud backends
+async function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
   try {

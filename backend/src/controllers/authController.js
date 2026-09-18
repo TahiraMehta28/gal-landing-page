@@ -76,9 +76,9 @@ export const signup = async (req, res) => {
     // Log verification code clearly in server logs
     console.log(`🔑 Verification code for ${user.email} is: [${verificationCode}]`);
 
-    // Send confirmation email and await dispatch
+    // Send confirmation email in background without blocking HTTP response
     console.log(`📧 Dispatching signup OTP verification email to: ${user.email}`);
-    const emailResult = await sendEmail({
+    sendEmail({
       to: user.email,
       clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Your Verification Code - GAL Acceleration Lab',
@@ -106,12 +106,7 @@ export const signup = async (req, res) => {
           </p>
         </div>
       `,
-    });
-    if (emailResult?.error) {
-      console.warn(`⚠️ Verification email delivery warning for ${user.email}:`, emailResult.error);
-    } else {
-      console.log(`✉️ Verification OTP email delivered successfully to: ${user.email}`);
-    }
+    }).catch((err) => console.warn(`⚠️ Verification email delivery warning:`, err.message));
 
     return res.status(201).json({
       success: true,
@@ -288,7 +283,7 @@ export const resendVerification = async (req, res) => {
     console.log(`🔑 Resent verification code for ${user.email} is: [${verificationCode}]`);
 
     console.log(`📧 Resending verification OTP to: ${user.email}`);
-    const emailResult = await sendEmail({
+    sendEmail({
       to: user.email,
       clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Your New Verification Code - GAL Acceleration Lab',
@@ -316,12 +311,7 @@ export const resendVerification = async (req, res) => {
           </p>
         </div>
       `,
-    });
-    if (emailResult?.error) {
-      console.warn(`⚠️ Resend verification email warning for ${user.email}:`, emailResult.error);
-    } else {
-      console.log(`✉️ Resent verification code email successfully dispatched to ${user.email}`);
-    }
+    }).catch((err) => console.warn(`⚠️ Resend verification warning:`, err.message));
 
     return res.status(200).json({
       success: true,
@@ -414,7 +404,7 @@ export const forgotPassword = async (req, res) => {
     console.log(`🔑 Password reset code for ${user.email} is: [${resetCode}]`);
 
     console.log(`📧 Sending password reset code email to: ${user.email}`);
-    const emailResult = await sendEmail({
+    sendEmail({
       to: user.email,
       clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Password Reset Code - GAL Acceleration Lab',
@@ -442,12 +432,7 @@ export const forgotPassword = async (req, res) => {
           </p>
         </div>
       `,
-    });
-    if (emailResult?.error) {
-      console.warn(`⚠️ Password reset code email delivery warning for ${user.email}:`, emailResult.error);
-    } else {
-      console.log(`✉️ Password reset code email successfully dispatched to ${user.email}`);
-    }
+    }).catch((err) => console.warn(`⚠️ Password reset code email warning:`, err.message));
 
     return res.status(200).json({
       success: true,
@@ -551,9 +536,9 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    // Send security email alert that password was changed
+    // Send security email alert that password was changed in background
     console.log(`📧 Sending password reset security alert to: ${user.email}`);
-    const emailResult = await sendEmail({
+    sendEmail({
       to: user.email,
       clientOrigin: req.headers.origin || req.headers.referer,
       subject: 'Security Alert: Password Updated - GAL Acceleration Lab',
@@ -580,12 +565,7 @@ export const resetPassword = async (req, res) => {
           </p>
         </div>
       `,
-    });
-    if (emailResult?.error) {
-      console.warn('⚠️ Password reset email delivery warning:', emailResult.error);
-    } else {
-      console.log(`✉️ Password reset alert email successfully dispatched to ${user.email}`);
-    }
+    }).catch((err) => console.warn('⚠️ Password reset email delivery warning:', err.message));
 
     const authToken = generateToken(user._id);
 
@@ -693,10 +673,10 @@ export const updateProfile = async (req, res) => {
     const updatedUser = await user.save();
     const token = generateToken(updatedUser._id);
 
-    // If password was changed, send email alert
+    // If password was changed, send email alert in background
     if (passwordChanged) {
       console.log(`📧 Sending password change security alert to: ${updatedUser.email}`);
-      const emailResult = await sendEmail({
+      sendEmail({
         to: updatedUser.email,
         clientOrigin: req.headers.origin || req.headers.referer,
         subject: 'Security Alert: Password Changed - GAL Acceleration Lab',
@@ -723,12 +703,7 @@ export const updateProfile = async (req, res) => {
             </p>
           </div>
         `,
-      });
-      if (emailResult?.error) {
-        console.warn('⚠️ Password change email delivery warning:', emailResult.error);
-      } else {
-        console.log(`✉️ Password change alert email successfully dispatched to ${updatedUser.email}`);
-      }
+      }).catch((err) => console.warn('⚠️ Password change email warning:', err.message));
     }
 
     return res.status(200).json({
