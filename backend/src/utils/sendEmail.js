@@ -11,9 +11,11 @@ function getTransporter() {
       service: 'gmail',
       auth: { user, pass },
       pool: true,
-      maxConnections: 5,
-      maxMessages: 100,
-      rateLimit: 14,
+      maxConnections: 3,
+      maxMessages: 50,
+      connectionTimeout: 4000,
+      greetingTimeout: 4000,
+      socketTimeout: 4000,
       tls: {
         rejectUnauthorized: false,
       },
@@ -50,30 +52,47 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     html,
   };
 
-  try {
-    const { transporter } = getTransporter();
-    console.log(`🚀 Dispatching email to: ${to} - "${subject}"`);
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✉️  Real Email successfully delivered to: ${to} (Message ID: ${info.messageId})`);
-    return { messageId: info.messageId };
-  } catch (err1) {
-    console.warn(`⚠️  Primary pool delivery attempt failed for ${to} (${err1.message}). Retrying directly...`);
-    pooledTransporter = null; // reset pool on error
-
+  const dispatch = async () => {
     try {
-      const directTransporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: { user, pass },
-        tls: { rejectUnauthorized: false },
-        connectionTimeout: 8000,
-      });
+      const { transporter } = getTransporter();
+      console.log(`🚀 Dispatching email to: ${to} - "${subject}"`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`✉️  Real Email successfully delivered to: ${to} (Message ID: ${info.messageId})`);
+      return { messageId: info.messageId };
+    } catch (err1) {
+      console.warn(`⚠️  Primary email delivery attempt failed for ${to} (${err1.message}). Retrying direct SMTP...`);
+      pooledTransporter = null;
 
-      const fallbackInfo = await directTransporter.sendMail(mailOptions);
-      console.log(`✉️  Real Email delivered via fallback to: ${to} (Message ID: ${fallbackInfo.messageId})`);
-      return { messageId: fallbackInfo.messageId };
-    } catch (err2) {
-      console.error(`❌ Real Email delivery error for ${to}:`, err2.message);
-      return { error: err2.message };
+      try {
+        const directTransporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST || 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: { user, pass },
+          tls: { rejectUnauthorized: false },
+          connectionTimeout: 4000,
+          greetingTimeout: 4000,
+          socketTimeout: 4000,
+        });
+
+        const fallbackInfo = await directTransporter.sendMail(mailOptions);
+        console.log(`✉️  Real Email delivered via direct SMTP to: ${to} (Message ID: ${fallbackInfo.messageId})`);
+        return { messageId: fallbackInfo.messageId };
+      } catch (err2) {
+        console.error(`❌ Real Email delivery error for ${to}:`, err2.message);
+        return { error: err2.message };
+      }
     }
-  }
+  };
+
+  // Never block HTTP requests for more than 3 seconds
+  return Promise.race([
+    dispatch(),
+    new Promise((resolve) =>
+      setTimeout(() => {
+        console.warn(`⏳ Email to ${to} taking >3s, continuing in background...`);
+        resolve({ messageId: 'background-dispatched' });
+      }, 3000)
+    ),
+  ]);
 };
