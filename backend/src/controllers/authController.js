@@ -44,7 +44,8 @@ export const signup = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: cleanEmail });
     let user;
 
     if (existingUser) {
@@ -55,13 +56,13 @@ export const signup = async (req, res) => {
         });
       }
       // If user registered before but never confirmed email, update and resend
-      existingUser.name = name;
+      existingUser.name = name.trim();
       existingUser.password = password;
       user = existingUser;
     } else {
       user = new User({
-        name,
-        email: email.toLowerCase(),
+        name: name.trim(),
+        email: cleanEmail,
         password,
         isVerified: false,
       });
@@ -69,13 +70,15 @@ export const signup = async (req, res) => {
 
     // Generate 6-digit confirmation code
     const { code: verificationCode } = user.getVerificationToken();
+    user.verificationCode = String(verificationCode).trim();
     await user.save();
 
     // Log verification code clearly in server logs
     console.log(`🔑 Verification code for ${user.email} is: [${verificationCode}]`);
 
-    // Send confirmation email asynchronously without blocking the signup HTTP response
-    sendEmail({
+    // Send confirmation email and await dispatch
+    console.log(`📧 Dispatching signup OTP verification email to: ${user.email}`);
+    const emailResult = await sendEmail({
       to: user.email,
       subject: 'Your Verification Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour 6-digit verification code is: ${verificationCode}\n\nEnter this code in the signup screen to complete your registration.\n\nThis code will expire in 24 hours.`,
@@ -102,15 +105,19 @@ export const signup = async (req, res) => {
           </p>
         </div>
       `,
-    }).catch(err => console.warn('Background sendEmail error:', err.message));
+    });
+    if (emailResult?.error) {
+      console.warn(`⚠️ Verification email delivery warning for ${user.email}:`, emailResult.error);
+    } else {
+      console.log(`✉️ Verification OTP email delivered successfully to: ${user.email}`);
+    }
 
     return res.status(201).json({
       success: true,
-      message: 'Verification code sent to your email! (You can also use backup code: 123456)',
+      message: 'Verification code sent to your email. Please check your inbox.',
       data: {
         email: user.email,
         name: user.name,
-        verificationCode: verificationCode,
       },
     });
   } catch (error) {
@@ -134,21 +141,47 @@ export const verifyCode = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide both email and 6-digit code' });
     }
 
-    const trimmedCode = code.trim();
-    const isMasterCode = trimmedCode === '123456';
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanCode = (code || '').toString().replace(/\D/g, '');
 
-    const user = await User.findOne({
-      email: email.toLowerCase(),
-      $or: [
-        { verificationCode: trimmedCode, verificationTokenExpire: { $gt: Date.now() } },
-        ...(isMasterCode ? [{}] : []),
-      ],
-    });
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email. Please sign up first.',
+      });
+    }
+
+    if (user.isVerified) {
+      const authToken = generateToken(user._id);
+      return res.status(200).json({
+        success: true,
+        message: 'Account is already verified! Signing you in...',
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          token: authToken,
+        },
+      });
+    }
+
+    const storedCode = (user.verificationCode || '').toString().trim();
+    console.log(`🔐 Comparing OTP for ${user.email} -> Entered: [${cleanCode}] vs Stored: [${storedCode}]`);
+
+    if (!storedCode || storedCode !== cleanCode) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired confirmation code. Please check your email or enter 123456.',
+        message: 'Incorrect 6-digit code. Please enter the latest code sent to your email.',
+      });
+    }
+
+    if (user.verificationTokenExpire && new Date(user.verificationTokenExpire).getTime() < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'This confirmation code has expired. Please click "Resend Code" to get a new code.',
       });
     }
 
@@ -253,7 +286,8 @@ export const resendVerification = async (req, res) => {
     // Log verification code clearly in server logs
     console.log(`🔑 Resent verification code for ${user.email} is: [${verificationCode}]`);
 
-    sendEmail({
+    console.log(`📧 Resending verification OTP to: ${user.email}`);
+    const emailResult = await sendEmail({
       to: user.email,
       subject: 'Your New Verification Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour new 6-digit verification code is: ${verificationCode}\n\nEnter this code in the signup screen to complete your registration.\n\nThis code will expire in 24 hours.`,
@@ -280,7 +314,12 @@ export const resendVerification = async (req, res) => {
           </p>
         </div>
       `,
-    }).catch(err => console.warn('Background sendEmail error:', err.message));
+    });
+    if (emailResult?.error) {
+      console.warn(`⚠️ Resend verification email warning for ${user.email}:`, emailResult.error);
+    } else {
+      console.log(`✉️ Resent verification code email successfully dispatched to ${user.email}`);
+    }
 
     return res.status(200).json({
       success: true,
@@ -372,7 +411,8 @@ export const forgotPassword = async (req, res) => {
     // Log reset code clearly in server logs
     console.log(`🔑 Password reset code for ${user.email} is: [${resetCode}]`);
 
-    sendEmail({
+    console.log(`📧 Sending password reset code email to: ${user.email}`);
+    const emailResult = await sendEmail({
       to: user.email,
       subject: 'Password Reset Code - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour 6-digit password reset code is: ${resetCode}\n\nEnter this code in the password reset form along with your new password.\n\nThis code will expire in 1 hour.`,
@@ -399,7 +439,12 @@ export const forgotPassword = async (req, res) => {
           </p>
         </div>
       `,
-    }).catch(err => console.warn('Background sendEmail error:', err.message));
+    });
+    if (emailResult?.error) {
+      console.warn(`⚠️ Password reset code email delivery warning for ${user.email}:`, emailResult.error);
+    } else {
+      console.log(`✉️ Password reset code email successfully dispatched to ${user.email}`);
+    }
 
     return res.status(200).json({
       success: true,
@@ -435,27 +480,59 @@ export const resetPassword = async (req, res) => {
 
     let user;
 
-    if (email) {
-      // Find user by email directly (no old password required)
-      user = await User.findOne({ email: email.toLowerCase() });
-    } else if (token) {
+    if (token) {
       // Verification via token link
       const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
       user = await User.findOne({
         resetPasswordToken: hashedToken,
         resetPasswordExpire: { $gt: Date.now() },
       });
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: 'Reset link is invalid or expired. Please request a new one.',
+        });
+      }
+    } else if (email) {
+      user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'No account found with this email address.',
+        });
+      }
+
+      // Check for current/old password or reset code
+      const oldPassword = req.body.currentPassword || req.body.oldPassword;
+      if (oldPassword) {
+        const isMatch = await user.matchPassword(oldPassword);
+        if (!isMatch) {
+          return res.status(400).json({
+            success: false,
+            message: 'Incorrect current password. Please enter your valid old password.',
+          });
+        }
+      } else if (code) {
+        const isValidCode =
+          user.resetPasswordCode &&
+          user.resetPasswordCode === code.trim() &&
+          user.resetPasswordExpire > Date.now();
+        if (!isValidCode) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid or expired 6-digit reset code.',
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide either your current (old) password or the 6-digit reset code.',
+        });
+      }
     } else {
       return res.status(400).json({
         success: false,
         message: 'Please provide your email and new password',
-      });
-    }
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'No account found with this email address. Please check your email.',
       });
     }
 
@@ -466,7 +543,8 @@ export const resetPassword = async (req, res) => {
     await user.save();
 
     // Send security email alert that password was changed
-    await sendEmail({
+    console.log(`📧 Sending password reset security alert to: ${user.email}`);
+    const emailResult = await sendEmail({
       to: user.email,
       subject: 'Security Alert: Password Updated - GAL Acceleration Lab',
       text: `Hello ${user.name},\n\nYour password for GAL Acceleration Lab was successfully updated.\n\nIf you made this change, no action is needed.\n\nIf you did NOT make this change, please contact support or reset your password immediately.`,
@@ -492,7 +570,12 @@ export const resetPassword = async (req, res) => {
           </p>
         </div>
       `,
-    }).catch((err) => console.error('Error sending password change alert email:', err));
+    });
+    if (emailResult?.error) {
+      console.warn('⚠️ Password reset email delivery warning:', emailResult.error);
+    } else {
+      console.log(`✉️ Password reset alert email successfully dispatched to ${user.email}`);
+    }
 
     const authToken = generateToken(user._id);
 
@@ -564,10 +647,32 @@ export const updateProfile = async (req, res) => {
     let passwordChanged = false;
     // Change password if requested
     if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please enter your current (old) password to set a new password.',
+        });
+      }
+
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Incorrect current password. Please enter your valid old password.',
+        });
+      }
+
       if (newPassword.length < 8) {
         return res.status(400).json({
           success: false,
           message: 'New password must be at least 8 characters long.',
+        });
+      }
+
+      if (currentPassword === newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'New password cannot be the same as your current password.',
         });
       }
 
@@ -580,7 +685,8 @@ export const updateProfile = async (req, res) => {
 
     // If password was changed, send email alert
     if (passwordChanged) {
-      await sendEmail({
+      console.log(`📧 Sending password change security alert to: ${updatedUser.email}`);
+      const emailResult = await sendEmail({
         to: updatedUser.email,
         subject: 'Security Alert: Password Changed - GAL Acceleration Lab',
         text: `Hello ${updatedUser.name},\n\nYour password for GAL Acceleration Lab was successfully changed from your profile.\n\nIf you made this change, no action is needed.\n\nIf you did NOT make this change, please contact support or reset your password immediately.`,
@@ -606,7 +712,12 @@ export const updateProfile = async (req, res) => {
             </p>
           </div>
         `,
-      }).catch((err) => console.error('Error sending password change alert email:', err));
+      });
+      if (emailResult?.error) {
+        console.warn('⚠️ Password change email delivery warning:', emailResult.error);
+      } else {
+        console.log(`✉️ Password change alert email successfully dispatched to ${updatedUser.email}`);
+      }
     }
 
     return res.status(200).json({

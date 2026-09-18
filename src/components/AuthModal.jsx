@@ -48,9 +48,6 @@ function validate(mode, form) {
   if (mode === 'forgot_password') {
     if (!form.email?.trim()) errors.email = 'Please enter your email'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Enter a valid email address'
-    if (!form.newPassword) errors.newPassword = 'Enter a new password'
-    else if (form.newPassword.length < 8) errors.newPassword = 'Must be at least 8 characters'
-    if (form.confirmPassword !== form.newPassword) errors.confirmPassword = "Passwords don't match"
   }
 
   if (mode === 'reset_password_code' || mode === 'reset_password') {
@@ -191,10 +188,8 @@ export default function AuthModal({
           throw new Error(data.message || 'Registration failed')
         }
 
-        setRegisteredEmail(form.email)
-        if (data.data?.verificationCode) {
-          setCodeDigits(data.data.verificationCode)
-        }
+        setRegisteredEmail((form.email || '').trim().toLowerCase())
+        setCodeDigits('')
         setStatus('idle')
         setMode('awaiting_verification')
         return
@@ -214,7 +209,7 @@ export default function AuthModal({
 
         if (!response.ok || !data.success) {
           if (data.isUnverified) {
-            setRegisteredEmail(form.email)
+            setRegisteredEmail((form.email || '').trim().toLowerCase())
             setMode('awaiting_verification')
             throw new Error(data.message)
           }
@@ -235,34 +230,24 @@ export default function AuthModal({
         return
       }
 
-      // 3. Forgot Password Flow -> Directly updates password, alerts user, and signs in
+      // 3. Forgot Password Flow -> Sends 6-digit reset code to email and opens code verification
       if (mode === 'forgot_password') {
-        const response = await fetch(`${API_URL}/reset-password`, {
+        const response = await fetch(`${API_URL}/forgot-password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: form.email,
-            password: form.newPassword,
+            email: form.email.trim(),
           }),
         })
         const data = await response.json()
 
         if (!response.ok || !data.success) {
-          throw new Error(data.message || 'Could not update password')
+          throw new Error(data.message || 'Could not send reset code')
         }
 
-        if (data.data?.token) {
-          localStorage.setItem('gal_token', data.data.token)
-          localStorage.setItem('gal_user', JSON.stringify(data.data))
-        }
-
-        setStatus('success')
-        onAuthSuccess?.(data.data)
-        setTimeout(() => {
-          onClose?.()
-          setStatus('idle')
-          setMode('signin')
-        }, 1300)
+        setRegisteredEmail(form.email.trim())
+        setStatus('idle')
+        setMode('reset_password_code')
         return
       }
 
@@ -356,8 +341,8 @@ export default function AuthModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: registeredEmail,
-          code: codeDigits.trim(),
+          email: (registeredEmail || form.email || '').trim().toLowerCase(),
+          code: codeDigits.replace(/\D/g, '').trim(),
         }),
       })
 
@@ -382,13 +367,14 @@ export default function AuthModal({
   }
 
   const handleResendVerification = async () => {
-    if (!registeredEmail) return
+    const targetEmail = (registeredEmail || form.email || '').trim().toLowerCase()
+    if (!targetEmail) return
     setResendStatus('loading')
     try {
       const res = await fetch(`${API_URL}/resend-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: registeredEmail }),
+        body: JSON.stringify({ email: targetEmail }),
       })
       const data = await res.json()
       if (!res.ok || !data.success) {
@@ -545,18 +531,8 @@ export default function AuthModal({
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setCodeDigits('123456')
-                        if (errors.code) setErrors((er) => ({ ...er, code: undefined }))
-                      }}
-                      className="text-xs font-semibold text-amber-800 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 py-1.5 px-3 rounded-full border border-amber-200 transition cursor-pointer"
-                    >
-                      💡 Didn&apos;t get email? Use Backup Code: 123456
-                    </button>
-                    <button
-                      type="button"
                       onClick={() => switchMode('signin')}
-                      className="text-xs font-medium text-slate-500 hover:text-slate-800 transition"
+                      className="text-xs font-medium text-slate-500 hover:text-slate-800 transition cursor-pointer"
                     >
                       Back to Sign In
                     </button>
@@ -613,7 +589,7 @@ export default function AuthModal({
                       : mode === 'signup'
                       ? 'Sign up for GAL'
                       : mode === 'forgot_password'
-                      ? 'Set New Password'
+                      ? 'Reset Password'
                       : mode === 'reset_password_code'
                       ? 'Enter code & new password'
                       : 'Choose a new password'}
@@ -625,7 +601,7 @@ export default function AuthModal({
                       : mode === 'signup'
                       ? 'Create your account. A confirmation will be sent to your email.'
                       : mode === 'forgot_password'
-                      ? 'Enter your email address, your new password, and confirm it.'
+                      ? 'Enter your email address to receive a 6-digit verification code.'
                       : mode === 'reset_password_code'
                       ? `Enter the 6-digit code sent to ${registeredEmail || form.email || 'your email'} and set your new password.`
                       : 'Your new password must be at least 8 characters long.'}
@@ -788,8 +764,8 @@ export default function AuthModal({
                         )}
                       </AnimatePresence>
 
-                      {/* Reset / Forgot Password Form Fields (New Password + Confirm Password) */}
-                      {(mode === 'reset_password' || mode === 'reset_password_code' || mode === 'forgot_password') && (
+                      {/* Reset Password Form Fields (New Password + Confirm Password) */}
+                      {(mode === 'reset_password' || mode === 'reset_password_code') && (
                         <>
                           <PasswordField
                             label="new password"
@@ -848,8 +824,10 @@ export default function AuthModal({
                           'Sign In'
                         ) : mode === 'signup' ? (
                           'Sign Up'
+                        ) : mode === 'forgot_password' ? (
+                          'Send Reset Code'
                         ) : (
-                          'Update Password'
+                          'Reset Password'
                         )}
                       </button>
 

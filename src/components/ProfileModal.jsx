@@ -24,10 +24,16 @@ function validate(form, changingPassword) {
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Please enter a valid email address'
 
   if (changingPassword) {
+    if (!form.currentPassword) {
+      errors.currentPassword = 'Enter your current (old) password'
+    }
+
     if (!form.newPassword) {
       errors.newPassword = 'Enter your new password'
     } else if (form.newPassword.length < 8) {
       errors.newPassword = 'New password must be at least 8 characters long'
+    } else if (form.currentPassword && form.newPassword === form.currentPassword) {
+      errors.newPassword = 'New password must be different from your old password'
     }
 
     if (!form.confirmPassword) {
@@ -252,7 +258,11 @@ export default function ProfileModal({
 
       if (!res.ok || !data.success) {
         // Specific error matching for current password mismatch
-        if (data.message && data.message.toLowerCase().includes('current password')) {
+        if (
+          data.message &&
+          (data.message.toLowerCase().includes('current password') ||
+            data.message.toLowerCase().includes('old password'))
+        ) {
           setErrors({ currentPassword: data.message })
           setStatus('idle')
           return
@@ -472,6 +482,17 @@ export default function ProfileModal({
                               Keep existing password
                             </button>
                           </div>
+
+                          <PasswordField
+                            label="Current (Old) Password"
+                            name="currentPassword"
+                            placeholder="Enter your current password"
+                            value={form.currentPassword}
+                            onChange={handleChange}
+                            error={errors.currentPassword}
+                            show={showCurrentPw}
+                            onToggleShow={() => setShowCurrentPw((s) => !s)}
+                          />
 
                           <PasswordField
                             label="New Password"
