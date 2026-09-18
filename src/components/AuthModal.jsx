@@ -15,6 +15,23 @@ import {
 
 import { AUTH_API_URL as API_URL } from '../config/api'
 
+// Resilient fetch wrapper with 15s timeout to prevent infinite spinners on sleeping cloud backends
+async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal })
+    clearTimeout(timeoutId)
+    return response
+  } catch (err) {
+    clearTimeout(timeoutId)
+    if (err.name === 'AbortError') {
+      throw new Error('Connection timed out. The server may be waking up, please try again.')
+    }
+    throw err
+  }
+}
+
 const EASE = [0.22, 1, 0.36, 1]
 const GOLD = '#C9A227'
 
@@ -140,6 +157,11 @@ export default function AuthModal({
 
   useEffect(() => {
     if (!isOpen) return
+    // Wake up sleeping backend immediately on modal open so auth requests respond fast
+    try {
+      const base = API_URL.replace(/\/api\/auth\/?$/, '')
+      fetch(`${base}/api/health`, { method: 'GET' }).catch(() => {})
+    } catch (e) {}
     const onKey = (e) => e.key === 'Escape' && onClose?.()
     window.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
@@ -173,7 +195,7 @@ export default function AuthModal({
     try {
       // 1. Sign Up Flow -> Generates confirmation email
       if (mode === 'signup') {
-        const response = await fetch(`${API_URL}/signup`, {
+        const response = await fetchWithTimeout(`${API_URL}/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -197,7 +219,7 @@ export default function AuthModal({
 
       // 2. Sign In Flow -> Verifies credentials and checks isVerified
       if (mode === 'signin') {
-        const response = await fetch(`${API_URL}/signin`, {
+        const response = await fetchWithTimeout(`${API_URL}/signin`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -232,7 +254,7 @@ export default function AuthModal({
 
       // 3. Forgot Password Flow -> Sends 6-digit reset code to email and opens code verification
       if (mode === 'forgot_password') {
-        const response = await fetch(`${API_URL}/forgot-password`, {
+        const response = await fetchWithTimeout(`${API_URL}/forgot-password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -253,7 +275,7 @@ export default function AuthModal({
 
       // 4. Reset Password with 6-Digit Code Flow
       if (mode === 'reset_password_code') {
-        const response = await fetch(`${API_URL}/reset-password`, {
+        const response = await fetchWithTimeout(`${API_URL}/reset-password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -286,7 +308,7 @@ export default function AuthModal({
       // 5. Reset Password via Link Token Flow
       if (mode === 'reset_password') {
         const url = resetToken ? `${API_URL}/reset-password/${resetToken}` : `${API_URL}/reset-password`
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -337,7 +359,7 @@ export default function AuthModal({
 
     setStatus('loading')
     try {
-      const response = await fetch(`${API_URL}/verify-code`, {
+      const response = await fetchWithTimeout(`${API_URL}/verify-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -371,7 +393,7 @@ export default function AuthModal({
     if (!targetEmail) return
     setResendStatus('loading')
     try {
-      const res = await fetch(`${API_URL}/resend-verification`, {
+      const res = await fetchWithTimeout(`${API_URL}/resend-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: targetEmail }),
@@ -393,7 +415,7 @@ export default function AuthModal({
     if (!targetEmail) return
     setResendStatus('loading')
     try {
-      const res = await fetch(`${API_URL}/forgot-password`, {
+      const res = await fetchWithTimeout(`${API_URL}/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: targetEmail }),
@@ -507,9 +529,12 @@ export default function AuthModal({
                       style={{ background: `linear-gradient(135deg, ${GOLD}, #E4C55A)` }}
                     >
                       {status === 'loading' ? (
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                        <span key="confirm-spinner" className="inline-flex items-center gap-2">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                          <span className="text-xs">Confirming...</span>
+                        </span>
                       ) : (
-                        'Confirm Code'
+                        <span key="confirm-text">Confirm Code</span>
                       )}
                     </button>
                   </form>
@@ -662,28 +687,20 @@ export default function AuthModal({
                   ) : (
                     <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3.5" noValidate>
                       {/* Name Field (Sign Up only) */}
-                      <AnimatePresence mode="wait">
-                        {mode === 'signup' && (
-                          <motion.div
-                            key="name-field"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.25, ease: EASE }}
-                            style={{ overflow: 'hidden' }}
-                          >
-                            <Field
-                              icon={User}
-                              ref={firstFieldRef}
-                              name="name"
-                              placeholder="Full name"
-                              value={form.name}
-                              onChange={handleChange}
-                              error={errors.name}
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {mode === 'signup' && (
+                        <div key="name-field-wrap">
+                          <Field
+                            icon={User}
+                            ref={firstFieldRef}
+                            name="name"
+                            placeholder="Full name"
+                            value={form.name}
+                            onChange={handleChange}
+                            error={errors.name}
+                            autoComplete="name"
+                          />
+                        </div>
+                      )}
 
                       {/* Email Field */}
                       {mode !== 'reset_password' && mode !== 'reset_password_code' && (
@@ -740,29 +757,21 @@ export default function AuthModal({
                       )}
 
                       {/* Confirm Password Field (Sign Up only) */}
-                      <AnimatePresence mode="wait">
-                        {mode === 'signup' && (
-                          <motion.div
-                            key="confirm-field"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.25, ease: EASE }}
-                            style={{ overflow: 'hidden' }}
-                          >
-                            <PasswordField
-                              label="confirm password"
-                              name="confirm"
-                              value={form.confirm}
-                              onChange={handleChange}
-                              error={errors.confirm}
-                              show={showConfirm}
-                              onToggleShow={() => setShowConfirm((s) => !s)}
-                              placeholder="Confirm password"
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {mode === 'signup' && (
+                        <div key="confirm-field-wrap">
+                          <PasswordField
+                            label="confirm password"
+                            name="confirm"
+                            value={form.confirm}
+                            onChange={handleChange}
+                            error={errors.confirm}
+                            show={showConfirm}
+                            onToggleShow={() => setShowConfirm((s) => !s)}
+                            placeholder="Confirm password"
+                            autoComplete="new-password"
+                          />
+                        </div>
+                      )}
 
                       {/* Reset Password Form Fields (New Password + Confirm Password) */}
                       {(mode === 'reset_password' || mode === 'reset_password_code') && (
@@ -819,15 +828,18 @@ export default function AuthModal({
                         style={{ background: `linear-gradient(135deg, ${GOLD}, #E4C55A)` }}
                       >
                         {status === 'loading' ? (
-                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                        ) : mode === 'signin' ? (
-                          'Sign In'
-                        ) : mode === 'signup' ? (
-                          'Sign Up'
-                        ) : mode === 'forgot_password' ? (
-                          'Send Reset Code'
+                          <span key="main-spinner" className="inline-flex items-center gap-2">
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                            <span className="text-xs font-semibold">Please wait...</span>
+                          </span>
                         ) : (
-                          'Reset Password'
+                          <span key="main-btn-text">
+                            {mode === 'signin' && 'Sign In'}
+                            {mode === 'signup' && 'Sign Up'}
+                            {mode === 'forgot_password' && 'Send Reset Code'}
+                            {mode === 'reset_password_code' && 'Reset Password'}
+                            {mode === 'reset_password' && 'Reset Password'}
+                          </span>
                         )}
                       </button>
 
