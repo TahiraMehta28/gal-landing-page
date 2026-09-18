@@ -82,11 +82,16 @@ async function sendViaHttpsBridge(endpointUrl, payload) {
 }
 
 export const sendEmail = async ({ to, subject, html, text, origin, clientOrigin }) => {
-  const user = process.env.EMAIL_USER?.trim() || 'tahiram.cs.23@nitj.ac.in';
-  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, '') || 'lxoyduateasrtwfn';
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, '');
   const rawFromName = process.env.FROM_NAME || 'GAL Acceleration Lab';
   const fromName = rawFromName.replace(/^["']|["']$/g, '').trim();
   const cleanTo = to?.trim().toLowerCase();
+
+  if (!user || !pass) {
+    console.warn(`⚠️ [sendEmail] EMAIL_USER or EMAIL_PASS environment variables are not set. Skipping email dispatch.`);
+    return { error: 'Email credentials not configured in environment' };
+  }
 
   const mailOptions = {
     from: `"${fromName}" <${user}>`,

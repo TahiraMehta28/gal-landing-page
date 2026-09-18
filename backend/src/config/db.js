@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
 
-const DEFAULT_MONGO_URI =
-  'mongodb+srv://tahiramehta28_db_user:h6d1fG5Gwb5KA3rB@cluster0.zv1cv65.mongodb.net/GAL?appName=Cluster0';
-
 export const connectDB = async () => {
   try {
-    const uri = process.env.MONGO_URI?.trim() || DEFAULT_MONGO_URI;
+    const uri = process.env.MONGO_URI?.trim();
+    if (!uri) {
+      console.warn('⚠️ MONGO_URI environment variable is missing.');
+      return;
+    }
 
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 8000,
-      bufferCommands: false, // Prevent infinite query buffering if connection drops
+      bufferCommands: false,
     });
     console.log(`✅ MongoDB Connected successfully to: ${conn.connection.host}`);
   } catch (error) {

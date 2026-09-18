@@ -29,10 +29,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Missing recipient or subject' });
   }
 
-  const user = process.env.EMAIL_USER?.trim() || 'tahiram.cs.23@nitj.ac.in';
-  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, '') || 'lxoyduateasrtwfn';
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, '');
   const rawFromName = process.env.FROM_NAME || 'GAL Acceleration Lab';
   const fromName = rawFromName.replace(/^["']|["']$/g, '').trim();
+
+  if (!user || !pass) {
+    return res.status(500).json({ success: false, message: 'EMAIL_USER or EMAIL_PASS environment variables are not set' });
+  }
 
   const mailOptions = {
     from: `"${fromName}" <${user}>`,
