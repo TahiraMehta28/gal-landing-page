@@ -223,8 +223,7 @@ export default function ImageSlider({ images = [], height = '200px', interval = 
             style={{
               position: 'absolute',
               bottom: '12px',
-              left: '50%',
-              transform: 'translateX(-50%)',
+              right: '16px',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',

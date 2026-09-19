@@ -632,6 +632,29 @@ export default function AuthModal({
                       : 'Your new password must be at least 8 characters long.'}
                   </p>
 
+                  {mode === 'signup' && (
+                    <p style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      marginTop: '10px',
+                      padding: '6px 14px',
+                      borderRadius: '999px',
+                      background: '#111111',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      letterSpacing: '0.02em',
+                      fontFamily: 'inherit',
+                      color: '#ffffff',
+                    }}>
+                      <span style={{ color: '#f59e0b', fontSize: '11px' }}>✦</span>
+                      Sign up once
+                      <span style={{ color: '#f59e0b', fontStyle: 'italic', fontWeight: 800 }}>&mdash; login for a lifetime</span>
+                    </p>
+                  )}
+
                   {/* Tabs for Sign In <-> Sign Up */}
                   {(mode === 'signin' || mode === 'signup') && (
                     <div className="mt-5 flex rounded-full border border-black/10 bg-black/[0.04] p-1">

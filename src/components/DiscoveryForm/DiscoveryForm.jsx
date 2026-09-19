@@ -368,7 +368,7 @@ const DiscoveryForm = forwardRef(function DiscoveryForm({ user }, ref) {
                     >
                       ← Back
                     </button>
-                    {step.type !== 'consent' && (
+                    {step.type !== 'consent' ? (
                       <button
                         type="button"
                         onClick={next}
@@ -386,8 +386,50 @@ const DiscoveryForm = forwardRef(function DiscoveryForm({ user }, ref) {
                       >
                         Continue →
                       </button>
+                    ) : (
+                      <button
+                        id="gal-builder-submit-btn"
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '8px',
+                          padding: '13px 28px', borderRadius: '12px',
+                          background: isSubmitting
+                            ? 'rgba(245,158,11,0.55)'
+                            : 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                          color: '#020617',
+                          fontWeight: 800, fontSize: '15px',
+                          border: 'none',
+                          cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                          fontFamily: 'inherit',
+                          boxShadow: isSubmitting
+                            ? 'none'
+                            : '0 10px 28px rgba(245,158,11,0.35)',
+                          transition: 'all 0.2s ease',
+                          letterSpacing: '0.01em',
+                        }}
+                        onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.transform = 'translateY(-1px)' }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)' }}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <span style={{
+                              width: '14px', height: '14px', border: '2px solid #020617',
+                              borderTopColor: 'transparent', borderRadius: '50%',
+                              display: 'inline-block', animation: 'spin 0.7s linear infinite',
+                            }} />
+                            Submitting…
+                          </>
+                        ) : (
+                          <>✦ Submit</>
+                        )}
+                      </button>
                     )}
                   </div>
+                  {step.type === 'consent' && (
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                  )}
                 </>
               )}
             </div>
